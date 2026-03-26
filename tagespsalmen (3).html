@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tagespsalmen</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Cinzel+Decorative:wght@400;700&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0b0d12;--bg2:#12141c;
+  --gold:#c9951b;--gold-l:#e8b84b;
+  --cream:#f0e6d3;--cream-dim:#b8a990;--muted:#7a6e60;
+  --border:rgba(201,149,27,0.22);
+  --sc:#6b2d8b;--sg:rgba(107,45,139,0.18);
+}
+html,body{min-height:100vh}
+body{background:var(--bg);background-image:radial-gradient(ellipse 60% 50% at 50% 0%,rgba(201,149,27,0.04),transparent);color:var(--cream);font-family:'EB Garamond',Georgia,serif;display:flex;justify-content:center;padding:0 16px 60px}
+.app{max-width:680px;width:100%;padding-top:36px}
+
+/* HEADER */
+.app-header{text-align:center;margin-bottom:6px;animation:fadeUp .7s ease both}
+.hd-orn{font-family:'Cinzel',serif;color:var(--gold);letter-spacing:14px;font-size:12px;opacity:.5;margin-bottom:10px}
+.hd-title{font-family:'Cinzel Decorative',serif;font-size:clamp(26px,7vw,44px);font-weight:400;color:var(--cream);letter-spacing:3px;text-shadow:0 0 60px rgba(201,149,27,.2),0 2px 4px rgba(0,0,0,.5);line-height:1.2}
+.hd-sub{font-family:'Cinzel',serif;font-size:10px;letter-spacing:4px;color:var(--muted);margin-top:9px;text-transform:uppercase}
+.divider{display:flex;align-items:center;gap:14px;margin:20px 0;opacity:.4}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:linear-gradient(to right,transparent,var(--gold))}
+.divider::after{background:linear-gradient(to left,transparent,var(--gold))}
+.divider span{color:var(--gold);font-size:13px}
+
+/* SEASON */
+.season-wrap{text-align:center;margin-bottom:22px;animation:fadeUp .7s .1s ease both}
+.season-ribbon{display:inline-flex;align-items:center;gap:10px;background:linear-gradient(135deg,var(--sc),color-mix(in srgb,var(--sc) 60%,#000));border-radius:6px;padding:7px 22px;font-family:'Cinzel',serif;font-size:11px;letter-spacing:4px;text-transform:uppercase;color:rgba(255,255,255,.88);border:1px solid rgba(255,255,255,.12);box-shadow:0 4px 24px var(--sg);transition:background .6s,box-shadow .6s}
+.special-day{display:none;margin-top:6px;font-family:'Cinzel',serif;font-size:10px;letter-spacing:3px;color:var(--gold);text-transform:uppercase}
+
+/* DATE NAV */
+.date-nav{display:flex;align-items:center;gap:12px;margin-bottom:26px;animation:fadeUp .7s .2s ease both}
+.nav-btn{background:transparent;border:1px solid var(--border);color:var(--gold);width:44px;height:44px;border-radius:50%;cursor:pointer;font-size:17px;display:flex;align-items:center;justify-content:center;transition:all .22s;flex-shrink:0;font-family:serif}
+.nav-btn:hover{background:rgba(201,149,27,.12);border-color:var(--gold);transform:scale(1.08)}
+.date-display{flex:1;text-align:center}
+.date-weekday{font-family:'Cinzel',serif;font-size:10px;letter-spacing:4px;text-transform:uppercase;color:var(--muted);margin-bottom:3px}
+.date-main{font-family:'EB Garamond',serif;font-size:clamp(20px,5vw,28px);font-weight:500;color:var(--cream)}
+.today-chip{display:inline-block;font-family:'Cinzel',serif;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);border:1px solid rgba(201,149,27,.45);border-radius:20px;padding:2px 7px;margin-left:7px;vertical-align:middle;position:relative;top:-2px}
+
+/* PSALM BUTTONS */
+.psalm-buttons{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:22px;animation:fadeUp .7s .3s ease both}
+.psalm-btn{background:var(--bg2);border:1px solid var(--border);color:var(--cream-dim);padding:18px 10px 16px;border-radius:10px;cursor:pointer;transition:all .25s;position:relative;overflow:hidden;text-align:center}
+.psalm-btn::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(201,149,27,.1),transparent);opacity:0;transition:opacity .25s}
+.psalm-btn:hover{border-color:rgba(201,149,27,.6);transform:translateY(-2px);box-shadow:0 8px 28px rgba(0,0,0,.45)}
+.psalm-btn:hover::after{opacity:1}
+.psalm-btn.active{background:linear-gradient(135deg,rgba(201,149,27,.18),rgba(201,149,27,.06));border-color:var(--gold);box-shadow:0 0 20px rgba(201,149,27,.15),inset 0 1px 0 rgba(201,149,27,.2)}
+.btn-type{display:block;font-family:'Cinzel',serif;font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-bottom:5px}
+.psalm-btn.active .btn-type{color:rgba(201,149,27,.75)}
+.btn-num{display:block;font-family:'Cinzel',serif;font-size:clamp(15px,4vw,22px);font-weight:600;letter-spacing:1px;color:var(--cream-dim);transition:color .25s;margin-bottom:3px}
+.psalm-btn.active .btn-num{color:var(--gold-l)}
+.btn-hint{display:block;font-size:13px;font-style:italic;color:var(--muted);opacity:.85;line-height:1.3;padding:0 4px;font-family:'EB Garamond',serif}
+.psalm-btn.active .btn-hint{color:var(--cream-dim)}
+
+/* PSALM VIEWER */
+.psalm-container{background:var(--bg2);border:1px solid var(--border);border-radius:14px;min-height:300px;position:relative;overflow:hidden;animation:fadeUp .7s .4s ease both}
+.psalm-container::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(to right,transparent,var(--sc),transparent);transition:background .6s}
+.psalm-container::after{content:'';position:absolute;bottom:0;left:0;right:0;height:50px;background:linear-gradient(to top,var(--bg2),transparent);pointer-events:none;z-index:2}
+.psalm-inner{padding:26px 30px 38px;max-height:68vh;overflow-y:auto;scrollbar-width:thin;scrollbar-color:rgba(201,149,27,.25) transparent}
+.psalm-inner::-webkit-scrollbar{width:4px}
+.psalm-inner::-webkit-scrollbar-thumb{background:rgba(201,149,27,.3);border-radius:2px}
+
+/* STATES */
+.state-placeholder{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:280px;gap:12px;padding:28px}
+.state-placeholder .icon{font-size:32px;opacity:.18;color:var(--gold)}
+.state-placeholder p{font-style:italic;font-size:17px;color:var(--muted);text-align:center;line-height:1.5}
+.hint{font-family:'Cinzel',serif;font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);opacity:.55}
+
+/* PSALM TEXT */
+.psalm-header{margin-bottom:20px;padding-bottom:14px;border-bottom:1px solid rgba(201,149,27,.15)}
+.psalm-label{font-family:'Cinzel',serif;font-size:9px;letter-spacing:5px;text-transform:uppercase;color:var(--gold);opacity:.8;margin-bottom:4px}
+.psalm-num{font-family:'Cinzel',serif;font-size:clamp(17px,4vw,23px);font-weight:600;color:var(--cream);letter-spacing:2px;margin-bottom:4px}
+.psalm-sup{font-style:italic;font-size:13.5px;color:var(--cream-dim);margin-top:4px;line-height:1.5}
+.psalm-badge{display:inline-block;font-family:'Cinzel',serif;font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);border:1px solid rgba(201,149,27,.4);border-radius:20px;padding:2px 9px;margin-top:6px}
+.psalm-verse{display:flex;gap:13px;padding:2px 0}
+.vnum{font-family:'Cinzel',serif;font-size:9px;color:var(--gold);opacity:.5;min-width:18px;text-align:right;padding-top:6px;flex-shrink:0}
+.vtext{font-family:'EB Garamond',serif;font-size:17.5px;line-height:1.8;color:var(--cream)}
+
+/* BOTTOM */
+.bottom-bar{display:flex;justify-content:center;gap:12px;margin-top:18px;animation:fadeUp .7s .5s ease both}
+.btn-today{background:transparent;border:1px solid var(--border);color:var(--muted);padding:8px 26px;border-radius:24px;cursor:pointer;font-family:'Cinzel',serif;font-size:10px;letter-spacing:3px;text-transform:uppercase;transition:all .22s}
+.btn-today:hover{border-color:var(--gold);color:var(--gold)}
+.btn-today:disabled{opacity:.25;cursor:default}
+.app-footer{text-align:center;margin-top:28px;font-size:12.5px;font-style:italic;color:var(--muted);opacity:.6;animation:fadeUp .7s .6s ease both}
+
+/* SEASON THEMES */
+.s-advent{--sc:#7b2d8b;--sg:rgba(123,45,139,.2)}
+.s-weihnachten{--sc:#b8860b;--sg:rgba(184,134,11,.2)}
+.s-epiphanie{--sc:#1a5a94;--sg:rgba(26,90,148,.2)}
+.s-fasten{--sc:#7a2020;--sg:rgba(122,32,32,.2)}
+.s-karwoche{--sc:#4a0e4e;--sg:rgba(74,14,78,.2)}
+.s-ostern{--sc:#b8970b;--sg:rgba(184,151,11,.25)}
+.s-himmelfahrt{--sc:#1a3d6b;--sg:rgba(26,61,107,.2)}
+.s-pfingsten{--sc:#b01c1c;--sg:rgba(176,28,28,.2)}
+.s-trinitatis{--sc:#1a5e2a;--sg:rgba(26,94,42,.2)}
+
+/* LIGHT MODE */
+.light{
+  --bg:#f5f0e8;--bg2:#fffdf7;
+  --gold:#9a6e0e;--gold-l:#b8880f;
+  --cream:#2c2418;--cream-dim:#5a4a30;--muted:#9a8a72;
+  --border:rgba(154,110,14,0.28);
+}
+.light body{background-image:radial-gradient(ellipse 60% 50% at 50% 0%,rgba(154,110,14,0.06),transparent)}
+.light .psalm-btn:hover{box-shadow:0 8px 28px rgba(0,0,0,.12)}
+.light .psalm-btn.active{box-shadow:0 0 20px rgba(154,110,14,.12),inset 0 1px 0 rgba(154,110,14,.25)}
+.light .psalm-container::after{background:linear-gradient(to top,var(--bg2),transparent)}
+.light .hd-title{text-shadow:0 0 60px rgba(154,110,14,.15),0 1px 2px rgba(0,0,0,.1)}
+
+/* THEME BUTTON */
+.btn-theme{background:transparent;border:1px solid var(--border);color:var(--muted);width:36px;height:36px;border-radius:50%;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;transition:all .22s;position:fixed;top:16px;right:16px;z-index:100;backdrop-filter:blur(4px)}
+.btn-theme:hover{border-color:var(--gold);color:var(--gold);transform:scale(1.1)}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:480px){.psalm-inner{padding:18px 16px 34px}.vtext{font-size:16px}}
+</style>
+</head>
+<body>
+<button class="btn-theme" id="btn-theme" title="Hell/Dunkel umschalten (Taste D)">☀︎</button>
+<div class="app s-trinitatis" id="app">
+  <header class="app-header">
+    <div class="hd-orn">✦ &nbsp; ✦ &nbsp; ✦</div>
+    <h1 class="hd-title">Tagespsalmen</h1>
+    <p class="hd-sub">Evangelisch-Lutherisches Kirchenjahr · Lutherbibel 1984</p>
+  </header>
+  <div class="divider"><span>✦</span></div>
+  <div class="season-wrap">
+    <div class="season-ribbon" id="season-ribbon">—</div>
+    <span class="special-day" id="special-day"></span>
+  </div>
+  <div class="date-nav">
+    <button class="nav-btn" id="btn-prev">&#8592;</button>
+    <div class="date-display">
+      <div class="date-weekday" id="date-weekday">—</div>
+      <div class="date-main" id="date-main">—</div>
+    </div>
+    <button class="nav-btn" id="btn-next">&#8594;</button>
+  </div>
+  <div class="psalm-buttons">
+    <button class="psalm-btn" id="pbtn-0" onclick="selectPsalm(0)">
+      <span class="btn-type">Wochenpsalm</span>
+      <span class="btn-num" id="pnum-0">—</span>
+      <span class="btn-hint" id="phint-0">Perikopenordnung</span>
+    </button>
+    <button class="psalm-btn" id="pbtn-1" onclick="selectPsalm(1)">
+      <span class="btn-type">Tagespsalm</span>
+      <span class="btn-num" id="pnum-1">—</span>
+      <span class="btn-hint" id="phint-1">Kirchenjahr</span>
+    </button>
+  </div>
+  <div class="psalm-container">
+    <div id="psalm-content">
+      <div class="state-placeholder">
+        <div class="icon">✦</div>
+        <p>Wähle einen Psalm<br>um ihn zu lesen</p>
+        <span class="hint">Tasten 1 · 2</span>
+      </div>
+    </div>
+  </div>
+  <div class="bottom-bar">
+    <button class="btn-today" id="btn-today" onclick="goToday()">Heute</button>
+  </div>
+  <footer class="app-footer">Wochenpsalmen nach EKD-Perikopenordnung · Lutherbibel 1984 · Vollständig offline</footer>
+</div>
+<script>
+/* PSALMEN DATENBANK TEIL 1 — Lutherbibel 1984 — Ps 1–72 */
+const PSALMEN = {};
+
+PSALMEN[1]={sup:"",v:[[1,"Wohl dem, der nicht wandelt im Rat der Gottlosen noch tritt auf den Weg der Sünder noch sitzt, wo die Spötter sitzen,"],[2,"sondern hat Lust am Gesetz des HERRN und sinnt über sein Gesetz Tag und Nacht!"],[3,"Der ist wie ein Baum, gepflanzt an den Wasserbächen, der seine Frucht bringt zu seiner Zeit, und seine Blätter verwelken nicht. Und was er macht, das gerät wohl."],[4,"Aber so sind die Gottlosen nicht, sondern wie Spreu, die der Wind verstreut."],[5,"Darum bestehen die Gottlosen nicht im Gericht noch die Sünder in der Gemeinde der Gerechten."],[6,"Denn der HERR kennt den Weg der Gerechten, aber der Weg der Gottlosen führt ins Verderben."]]};
+
+PSALMEN[2]={sup:"",v:[[1,"Warum toben die Heiden und murren die Völker vergeblich?"],[2,"Die Könige der Erde lehnen sich auf, und die Herren halten Rat miteinander wider den HERRN und seinen Gesalbten:"],[3,"»Lasst uns zerreißen ihre Bande und von uns werfen ihre Stricke!«"],[4,"Aber der im Himmel thront, lacht ihrer; der Herr spottet ihrer."],[5,"Dann wird er mit ihnen reden in seinem Zorn und in seinem Grimm sie erschrecken:"],[6,"»Ich aber habe meinen König eingesetzt auf Zion, meinem heiligen Berg.«"],[7,"Ich will von der Entscheidung des HERRN reden. Er hat zu mir gesagt: Du bist mein Sohn; heute habe ich dich gezeugt."],[8,"Bitte mich, so will ich dir die Heiden zum Erbe geben und die Enden der Erde zu deinem Eigentum."],[9,"Du sollst sie mit einem eisernen Zepter zerschlagen, wie Töpfergefäße sollst du sie zertrümmern."],[10,"Und nun, ihr Könige, seid weise; lasst euch warnen, ihr Richter der Erde!"],[11,"Dienet dem HERRN mit Furcht und jauchzet mit Zittern!"],[12,"Huldigt dem Sohn, damit er nicht zürne und ihr nicht umkommt auf dem Wege; denn sein Zorn kann schnell entbrennen. Wohl allen, die auf ihn vertrauen!"]]};
+
+PSALMEN[4]={sup:"Ein Psalm Davids.",v:[[1,"Wenn ich rufe, so erhöre mich, Gott, du mein Hort! Du hast mir Raum gemacht, als mir's eng war. Sei mir gnädig und erhöre mein Gebet!"],[2,"Ihr Herren, wie lange soll meine Ehre geschändet werden? Ihr liebt das Eitle und sucht die Lüge."],[3,"Erkennt doch, dass der HERR mir seinen Heiligen wunderbar gemacht hat; der HERR erhört mich, wenn ich zu ihm rufe."],[4,"Zürnt ihr, so sündigt nicht; redet in eurem Herzen auf eurem Lager und seid stille."],[5,"Opfert Opfer der Gerechtigkeit und hoffet auf den HERRN."],[6,"Viele sagen: Wer wird uns Gutes sehen lassen? Erhebe über uns das Licht deines Angesichts, HERR!"],[7,"Du erfreust mein Herz, das sonst mehr Freude hätte, wenn Korn und Wein in Fülle vorhanden wären."],[8,"Ich liege und schlafe in Frieden; denn allein du, HERR, hilfst mir, dass ich sicher wohne."]]};
+
+PSALMEN[8]={sup:"Dem Chorleiter. Nach der Weise »Über die Kelter«. Ein Psalm Davids.",v:[[1,"HERR, unser Herrscher, wie herrlich ist dein Name in allen Landen, der du zeigst deine Hoheit am Himmel!"],[2,"Aus dem Mund der Kinder und Säuglinge hast du dir Lob zugerichtet um deiner Feinde willen, damit du den Feind und den Rachgierigen zum Schweigen bringst."],[3,"Wenn ich sehe die Himmel, deiner Finger Werk, den Mond und die Sterne, die du bereitet hast:"],[4,"Was ist der Mensch, dass du seiner gedenkst, und des Menschen Kind, dass du dich um ihn kümmerst?"],[5,"Du hast ihn wenig niedriger gemacht als Gott, mit Ehre und Herrlichkeit hast du ihn gekrönt."],[6,"Du hast ihn zum Herrn gemacht über deiner Hände Werk, alles hast du unter seine Füße gelegt:"],[7,"Schafe und Rinder allzumal, dazu auch die wilden Tiere,"],[8,"die Vögel unter dem Himmel und die Fische im Meer und alles, was die Meere durchzieht."],[9,"HERR, unser Herrscher, wie herrlich ist dein Name in allen Landen!"]]};
+
+PSALMEN[16]={sup:"Ein Miktam Davids.",v:[[1,"Bewahre mich, Gott, denn ich vertraue auf dich!"],[2,"Ich habe gesagt zu dem HERRN: Du bist mein Herr; mein Gut ist mir nichts ohne dich."],[3,"An den Heiligen, die auf Erden sind, den Herrlichen – an denen habe ich Gefallen."],[4,"Aber die auf andere gehen, die werden große Not haben. Ich will nicht zu ihren Trankopfern nehmen Blut noch ihre Namen auf meine Lippen nehmen."],[5,"Der HERR ist mein Anteil und mein Teil; du erhältst mir mein Gut."],[6,"Das Los ist mir gefallen auf's Lieblichste; mir ist ein schönes Erbteil geworden."],[7,"Ich lobe den HERRN, der mir geraten hat; auch züchtigt mich mein Herz des Nachts."],[8,"Ich habe den HERRN allezeit vor Augen; er ist mir zur Rechten, ich werde nicht wanken."],[9,"Darum freut sich mein Herz, und meine Ehre ist fröhlich; auch mein Leib wird sicher liegen."],[10,"Denn du wirst meine Seele nicht dem Tode lassen und nicht zugeben, dass dein Heiliger die Grube sehe."],[11,"Du tust mir kund den Weg zum Leben. Vor dir ist Freude die Fülle und Wonne zu deiner Rechten ewiglich."]]};
+
+PSALMEN[19]={sup:"Dem Chorleiter. Ein Psalm Davids.",v:[[1,"Die Himmel erzählen die Ehre Gottes, und die Feste verkündigt seiner Hände Werk."],[2,"Ein Tag sagt's dem andern, und eine Nacht tut's der andern kund."],[3,"Es ist keine Sprache noch Rede, wo man nicht ihre Stimme hörte."],[4,"Ihr Klang geht aus in alle Lande und ihr Reden bis an die Enden der Welt. Er hat der Sonne ein Zelt gemacht am Himmel."],[5,"Die geht heraus wie ein Bräutigam aus seiner Kammer und freut sich wie ein Held, zu laufen die Bahn."],[6,"Sie geht auf an einem Ende des Himmels und läuft um bis ans andere Ende, und nichts bleibt vor ihrer Glut verborgen."],[7,"Das Gesetz des HERRN ist vollkommen und erquickt die Seele. Das Zeugnis des HERRN ist gewiss und macht die Unverständigen weise."],[8,"Die Befehle des HERRN sind richtig und erfreuen das Herz. Das Gebot des HERRN ist lauter und erleuchtet die Augen."],[9,"Die Furcht des HERRN ist rein und bleibt ewiglich. Die Rechte des HERRN sind wahrhaftig, allesamt gerecht."],[10,"Sie sind köstlicher als Gold und viel feines Gold, und süßer als Honig und Honigseim."],[11,"Dein Knecht wird durch sie gewarnt; wer sie hält, der hat großen Lohn."],[12,"Wer kann merken, wie oft er fehlt? Sprich mich frei von Schulden, die ich nicht erkenne."],[13,"Auch halt deinen Knecht von vermessenen Sünden; die sollen nicht über mich herrschen. Dann werde ich unsträflich und ledig von großer Missetat."],[14,"Lass dir wohlgefallen die Rede meines Mundes und das Sinnen meines Herzens vor dir, HERR, mein Fels und mein Erlöser!"]]};
+
+PSALMEN[22]={sup:"Dem Chorleiter. Nach der Weise »Hirschkuh der Morgenröte«. Ein Psalm Davids.",v:[[1,"Mein Gott, mein Gott, warum hast du mich verlassen? Ich schreie, aber meine Hilfe ist ferne."],[2,"Mein Gott, des Tages rufe ich, doch antwortest du nicht, und des Nachts, doch finde ich keine Ruhe."],[3,"Aber du bist heilig, der du thronst über dem Lob Israels."],[4,"Unsere Väter hofften auf dich; und da sie hofften, halfst du ihnen heraus."],[5,"Zu dir schrien sie und wurden errettet; auf dich hofften sie und wurden nicht zuschanden."],[6,"Ich aber bin ein Wurm und kein Mensch, ein Spott der Leute und verachtet vom Volk."],[7,"Alle, die mich sehen, verspotten mich, sperren das Maul auf und schütteln den Kopf:"],[8,"»Er klage es dem HERRN, der helfe ihm heraus und rette ihn, hat er Gefallen an ihm.«"],[9,"Du hast mich aus meiner Mutter Leib gezogen; du ließest mich geborgen sein an meiner Mutter Brust."],[10,"Auf dich bin ich geworfen von Mutterleib an, du bist mein Gott von meiner Mutter Schoß an."],[11,"Sei nicht ferne von mir, denn Angst ist nahe; denn es ist hier kein Helfer."],[12,"Viele Stiere haben mich umgeben, starke Stiere von Baschan haben mich umringt."],[13,"Sie sperren gegen mich ihren Rachen auf, wie ein reißender und brüllender Löwe."],[14,"Ich bin ausgeschüttet wie Wasser, und alle meine Knochen haben sich voneinander getrennt; mein Herz ist in meinem Leibe wie zerschmolzenes Wachs."],[15,"Meine Kraft ist vertrocknet wie eine Scherbe, und meine Zunge klebt an meinem Gaumen, und du legst mich in des Todes Staub."],[16,"Denn Hunde haben mich umgeben, und der Bösen Rotte hat mich umringt; sie haben meine Hände und Füße durchgraben."],[17,"Ich kann alle meine Knochen zählen; sie aber schauen zu und sehen auf mich herab."],[18,"Sie teilen meine Kleider unter sich und werfen das Los um mein Gewand."],[19,"Du aber, HERR, sei nicht ferne; meine Stärke, eile mir zu helfen!"],[20,"Errette meine Seele vom Schwert, mein Leben von der Gewalt der Hunde."],[21,"Hilf mir aus dem Rachen des Löwen und vor den Hörnern der Wildstiere rette mich!"],[22,"Ich will deinen Namen meinen Brüdern verkündigen, ich will dich inmitten der Gemeinde loben."],[23,"Ihr, die ihr den HERRN fürchtet, lobet ihn! Alle Nachkommen Jakobs, ehret ihn! Es fürchte ihn alle Nachkommen Israels!"],[24,"Denn er hat nicht verachtet noch verschmäht das Elend des Armen, hat sein Antlitz nicht vor ihm verborgen; sondern als er zu ihm schrie, hörte er's."],[25,"Von dir kommt mein Lob in der großen Gemeinde; ich will meine Gelübde erfüllen vor denen, die ihn fürchten."],[26,"Die Elenden sollen essen und satt werden, und die nach dem HERRN fragen, werden ihn loben. Euer Herz lebe auf ewig!"],[27,"Es werden gedenken und werden sich zum HERRN bekehren alle Welt und zu ihm fallen alle Geschlechter der Heiden."],[28,"Denn das Reich ist des HERRN, und er herrscht unter den Völkern."],[29,"Alle Fetten auf Erden werden essen und anbeten; vor ihm werden knien alle, die in den Staub müssen, und keiner wird sein Leben halten."],[30,"Ihre Nachkommenschaft wird ihm dienen; sie wird dem HERRN erzählt werden immer und ewig."],[31,"Sie werden kommen und seine Gerechtigkeit verkündigen dem Volk, das geboren wird: denn er hat's getan."]]};
+
+PSALMEN[23]={sup:"Ein Psalm Davids.",v:[[1,"Der HERR ist mein Hirte, mir wird nichts mangeln."],[2,"Er weidet mich auf einer grünen Aue und führet mich zum frischen Wasser."],[3,"Er erquicket meine Seele. Er führet mich auf rechter Straße um seines Namens willen."],[4,"Und ob ich schon wanderte im finstern Tal, fürchte ich kein Unglück; denn du bist bei mir, dein Stecken und Stab trösten mich."],[5,"Du bereitest vor mir einen Tisch im Angesicht meiner Feinde. Du salbest mein Haupt mit Öl und schenkest mir voll ein."],[6,"Gutes und Barmherzigkeit werden mir folgen mein Leben lang, und ich werde bleiben im Hause des HERRN immerdar."]]};
+
+PSALMEN[24]={sup:"Ein Psalm Davids.",v:[[1,"Die Erde ist des HERRN und was darinnen ist, der Erdkreis und die darauf wohnen."],[2,"Denn er hat ihn über den Meeren gegründet und über den Strömen bereitet."],[3,"Wer darf auf den Berg des HERRN gehen, und wer darf stehen an seiner heiligen Stätte?"],[4,"Wer unschuldige Hände hat und reinen Herzens ist, wer nicht bedachtsam mit falschen Dingen umgeht und nicht schwört zum Trug:"],[5,"Der wird den Segen vom HERRN empfangen und Gerechtigkeit von dem Gott seines Heils."],[6,"Das ist das Geschlecht, das nach ihm fragt, das da sucht dein Antlitz, Jakob."],[7,"Machet die Tore weit und die Türen in der Welt hoch, dass der König der Ehre einziehe!"],[8,"Wer ist der König der Ehre? Es ist der HERR, stark und mächtig, der HERR, mächtig im Streit."],[9,"Machet die Tore weit und die Türen in der Welt hoch, dass der König der Ehre einziehe!"],[10,"Wer ist der König der Ehre? Es ist der HERR Zebaoth; er ist der König der Ehre."]]};
+
+PSALMEN[25]={sup:"Von David.",v:[[1,"Nach dir, HERR, verlanget mich. Mein Gott, ich hoffe auf dich."],[2,"Lass mich nicht zuschanden werden, dass meine Feinde nicht frohlocken über mich."],[3,"Denn keiner, der auf dich harrt, wird zuschanden; aber die treulos sind ohne Grund, die werden zuschanden."],[4,"Zeige mir, HERR, deine Wege und lehre mich deine Steige."],[5,"Leite mich in deiner Wahrheit und lehre mich; denn du bist der Gott, der mir hilft; täglich harre ich auf dich."],[6,"Gedenke, HERR, an deine Barmherzigkeit und an deine Güte, die von Ewigkeit her gewesen sind."],[7,"Gedenke nicht der Sünden meiner Jugend und meiner Übertretungen; gedenke aber meiner nach deiner Güte um deiner Güte willen, HERR."],[8,"Der HERR ist gut und gerecht; darum weist er die Sünder auf den Weg."],[9,"Er leitet die Elenden recht und lehret die Elenden seinen Weg."],[10,"Alle Pfade des HERRN sind Güte und Treue denen, die seinen Bund und seine Zeugnisse halten."],[11,"Um deines Namens willen, HERR, vergib mir meine Schuld, denn sie ist groß."],[12,"Wer ist der Mann, der den HERRN fürchtet? Den wird er unterweisen auf dem Weg, den er wählen soll."],[13,"Seine Seele wird im Guten wohnen, und sein Geschlecht wird das Land besitzen."],[14,"Der HERR ist denen vertraut, die ihn fürchten; er zeigt ihnen seinen Bund."],[15,"Meine Augen sehen stets auf den HERRN; denn er wird meinen Fuß aus dem Netz ziehen."],[16,"Wende dich zu mir und sei mir gnädig; denn ich bin einsam und elend."],[17,"Die Angst in meinem Herzen ist groß; führe mich heraus aus meinen Nöten."],[18,"Sieh an mein Elend und meine Mühsal und vergib mir alle meine Sünden."],[19,"Sieh, wie viele meine Feinde sind und wie grimmig sie mich hassen."],[20,"Bewahre meine Seele und errette mich; lass mich nicht zuschanden werden, denn ich traue auf dich."],[21,"Redlichkeit und Frömmigkeit werden mich schützen; denn ich harre auf dich."],[22,"Erlöse, Gott, Israel aus allen seinen Nöten!"]]};
+
+PSALMEN[27]={sup:"Von David.",v:[[1,"Der HERR ist mein Licht und mein Heil; vor wem sollte ich mich fürchten? Der HERR ist die Kraft meines Lebens; vor wem sollte mir grauen?"],[2,"Wenn die Übeltäter herannahen, um mein Fleisch zu fressen – meine Bedränger und Feinde –, so stolpern und fallen sie."],[3,"Wenn sich Heerscharen gegen mich lagern, fürchtet sich mein Herz nicht; wenn sich Krieg gegen mich erhebt, verlasse ich mich dennoch darauf."],[4,"Eines bitte ich vom HERRN, das hätte ich gern: dass ich im Hause des HERRN wohnen möge mein Leben lang, die Freundlichkeit des HERRN zu betrachten und seinen Tempel zu besuchen."],[5,"Denn er verbirgt mich in seiner Hütte zur bösen Zeit, er versteckt mich im Schutz seines Zeltes, er hebt mich auf einen Felsen."],[6,"Nun hebt er mein Haupt empor über meine Feinde rings um mich her; und ich will in seinem Zelt Opfer des Jubels opfern; ich will singen und dem HERRN lobsingen."],[7,"Höre, HERR, meine Stimme, die ich rufe; sei mir gnädig und antworte mir!"],[8,"Mein Herz hält dir vor dein Wort: »Suchet mein Angesicht!« Darum suche ich auch, HERR, dein Angesicht."],[9,"Verbirg nicht dein Angesicht vor mir, weise nicht ab im Zorn deinen Knecht. Du bist meine Hilfe; verlass mich nicht und tu mich nicht von dir, Gott, mein Heil."],[10,"Denn mein Vater und meine Mutter haben mich verlassen, aber der HERR nimmt mich auf."],[11,"HERR, weise mir deinen Weg und leite mich auf ebenem Pfad um meiner Feinde willen."],[12,"Überliefere mich nicht dem Willen meiner Bedränger; denn es erheben sich falsche Zeugen gegen mich, und wer Gewalt schnaubt."],[13,"Ich glaube aber, dass ich sehen werde die Güte des HERRN im Lande der Lebendigen."],[14,"Harre auf den HERRN! Sei getrost und unverzagt und harre auf den HERRN!"]]};
+
+PSALMEN[29]={sup:"Ein Psalm Davids.",v:[[1,"Bringet dar dem HERRN, ihr Gottessöhne, bringet dar dem HERRN Ehre und Stärke!"],[2,"Bringet dar dem HERRN die Ehre seines Namens, betet an den HERRN in heiligem Schmuck!"],[3,"Die Stimme des HERRN geht auf den Wassern; der Gott der Ehre donnert; der HERR ist über großen Wassern."],[4,"Die Stimme des HERRN erschallt mit Macht; die Stimme des HERRN erschallt herrlich."],[5,"Die Stimme des HERRN zerbricht Zedern; der HERR zerbricht die Zedern des Libanon."],[6,"Er macht sie hüpfen wie Kälber, den Libanon und Sirjon wie junge Wildstiere."],[7,"Die Stimme des HERRN schlägt feurige Flammen."],[8,"Die Stimme des HERRN erschüttert die Wüste; der HERR erschüttert die Wüste Kadesch."],[9,"Die Stimme des HERRN lässt die Hirsche gebären und deckt die Wälder ab. Und in seinem Tempel ruft alles: Ehre!"],[10,"Der HERR hat gesessen über der Wasserflut, und der HERR sitzt als König ewiglich."],[11,"Der HERR gebe Kraft seinem Volk! Der HERR segne sein Volk mit Frieden!"]]};
+
+PSALMEN[30]={sup:"Ein Psalm. Ein Lied zur Einweihung des Hauses. Von David.",v:[[1,"Ich will dich rühmen, HERR, denn du hast mich herausgezogen und hast meine Feinde nicht über mich frohlocken lassen."],[2,"HERR, mein Gott, ich schrie zu dir, und du hast mich geheilt."],[3,"HERR, du hast meine Seele aus dem Totenreich heraufgebracht, du hast mich gerettet vor denen, die in die Grube fahren."],[4,"Lobsinget dem HERRN, ihr seine Heiligen, und danket ihm für seine heilige Güte!"],[5,"Denn sein Zorn währet einen Augenblick und sein Wohlgefallen ein Leben lang. Den Abend lang währet das Weinen, aber am Morgen ist Freude."],[6,"Ich aber sprach in meiner Sicherheit: Ich werde nimmermehr wanken."],[7,"HERR, durch deine Güte hattest du meinem Berg Kraft und Stärke gegeben. Aber du verbargst dein Angesicht, da erschrak ich."],[8,"Zu dir, HERR, rief ich, und zum HERRN flehte ich:"],[9,"Was ist's für ein Gewinn, wenn ich in die Grube fahre? Kann dich auch der Staub loben und deine Wahrheit verkündigen?"],[10,"Höre, HERR, und sei mir gnädig; HERR, sei mein Helfer!"],[11,"Du hast meine Klage verwandelt in einen Reigen; du hast mir den Sack aufgelöst und mich mit Freude gegürtet,"],[12,"damit mein Herz dir lobsinge und nicht stille sei. HERR, mein Gott, ich will dir danken ewiglich!"]]};
+
+PSALMEN[31]={sup:"Dem Chorleiter. Ein Psalm Davids.",v:[[1,"Auf dich, HERR, traue ich, lass mich nimmermehr zuschanden werden, errette mich durch deine Gerechtigkeit!"],[2,"Neige deine Ohren zu mir, eile, mir zu helfen! Sei mir ein fester Fels und eine Burg, dass du mir helfest!"],[3,"Denn du bist mein Fels und meine Burg; und um deines Namens willen wollest du mich leiten und führen."],[4,"Du wollest mich aus dem Netz ziehen, das sie mir gestellt haben; denn du bist meine Stärke."],[5,"In deine Hände befehle ich meinen Geist; du hast mich erlöset, HERR, du treuer Gott."],[6,"Ich hasse, die auf nichtige Götzen halten; ich aber vertraue auf den HERRN."],[7,"Ich will fröhlich und froh sein über deine Güte, dass du mein Elend siehst und kennst meine Seele in der Not"],[8,"und mich nicht preisgibst in des Feindes Hand; du stellst meine Füße auf weiten Raum."],[9,"Sei mir gnädig, HERR, denn mir ist angst; mein Auge ist trübe geworden vor Gram, meine Seele und mein Leib."],[10,"Denn mein Leben ist hingeschwunden in Kummer und meine Jahre in Seufzen; meine Kraft ist verfallen durch meine Schuld, und meine Gebeine sind verschmachtet."],[11,"Ich bin allen meinen Feinden ein Spott geworden und meinen Nachbarn sehr, und ein Schrecken meinen Bekannten; die mich auf der Gasse sehen, fliehen vor mir."],[12,"Ich bin vergessen wie ein Toter aus dem Sinn, wie ein zerbrochenes Gefäß."],[13,"Denn ich höre das böse Gerede vieler; sie haben Schrecken verbreitet rings um mich; wenn sie miteinander Rat halten wider mich, sinnen sie darauf, mir das Leben zu nehmen."],[14,"Ich aber vertraue auf dich, HERR; ich sage: Du bist mein Gott."],[15,"Meine Zeit steht in deinen Händen. Errette mich von der Hand meiner Feinde und von denen, die mich verfolgen."],[16,"Lass dein Angesicht leuchten über deinen Knecht, hilf mir durch deine Güte!"],[17,"HERR, lass mich nicht zuschanden werden, dass ich dich anrufe; die Gottlosen sollen zuschanden werden und in die Unterwelt fahren."],[18,"Die Lügenmäuler sollen verstummen, die da Falsches reden gegen den Gerechten mit Hochmut und Verachtung."],[19,"Wie groß ist deine Güte, die du bewahrt hast denen, die dich fürchten, die du erwiesen hast vor den Menschenkindern denen, die auf dich trauen!"],[20,"Du birgst sie unter dem Schutz deines Angesichts vor dem Wüten der Menschen; du versteckst sie in deiner Hütte vor dem Streit der Zungen."],[21,"Gelobet sei der HERR; denn er hat wunderbar an mir getan seine Güte in einer festen Stadt."],[22,"Ich hatte wohl gesagt in meiner Angst: Ich bin verstoßen von deinen Augen. Doch du hörtest die Stimme meines Flehens, als ich zu dir rief."],[23,"Liebet den HERRN, all seine Heiligen! Der HERR behütet die Treuen und vergilt dem Hochmütigen reichlich."],[24,"Seid getrost und unverzagt alle, die ihr auf den HERRN hofft!"]]};
+
+PSALMEN[32]={sup:"Ein Maskil Davids.",v:[[1,"Wohl dem, dem die Übertretungen vergeben sind, dem die Sünde bedeckt ist!"],[2,"Wohl dem Menschen, dem der HERR die Schuld nicht zurechnet und in dessen Geist kein Trug ist!"],[3,"Als ich es verschweigen wollte, verschmachteten meine Gebeine durch mein tägliches Klagen."],[4,"Denn Tag und Nacht lag deine Hand schwer auf mir; mein Saft vertrocknete, wie es im Sommer dürr wird."],[5,"Meine Sünde bekannte ich dir und meine Schuld verhehlte ich nicht. Ich sprach: Ich will dem HERRN meine Übertretungen bekennen. Da vergabst du mir die Schuld meiner Sünde."],[6,"Darum werden alle Heiligen zu dir beten zur Zeit der Bedrängnis; läuft auch große Wasserflut heran, so wird sie doch nicht an sie reichen."],[7,"Du bist mein Schirm, du wirst mich vor Angst behüten, du wirst mich umgeben mit Liedern der Errettung."],[8,"Ich will dich unterweisen und dir den Weg zeigen, den du gehen sollst; ich will dich mit meinen Augen leiten."],[9,"Seid nicht wie Rosse und Maultiere, die ohne Verstand sind, welchen man mit Zaum und Gebiss das Maul stopfen muss, damit sie sich dir nicht nähern."],[10,"Viele Schmerzen hat der Gottlose; aber wer auf den HERRN vertraut, den umgibt er mit Güte."],[11,"Freuet euch des HERRN und seid fröhlich, ihr Gerechten, und jauchzet, alle, die ihr frommen Herzens seid!"]]};
+
+PSALMEN[33]={sup:"",v:[[1,"Jauchzet, ihr Gerechten, dem HERRN; für die Aufrichtigen ist Loben schön."],[2,"Danket dem HERRN mit der Harfe und lobsinget ihm mit dem Psalter von zehn Saiten!"],[3,"Singet ihm ein neues Lied, spielet schön auf den Saiten mit lautem Schall!"],[4,"Denn das Wort des HERRN ist wahrhaftig, und was er zusagt, das hält er gewiss."],[5,"Er liebt Gerechtigkeit und Recht; die Erde ist voll der Güte des HERRN."],[6,"Durch das Wort des HERRN sind die Himmel gemacht, und durch den Hauch seines Mundes all ihr Heer."],[7,"Er fasst das Wasser des Meeres zusammen wie in einem Schlauch, er legt den Ozean in Vorratskammern."],[8,"Alle Welt fürchte den HERRN, und vor ihm scheue sich alles, was auf dem Erdkreis wohnt."],[9,"Denn er sprach, so geschah's; er gebot, so stand es da."],[10,"Der HERR macht den Ratschluss der Heiden zunichte und hindert die Gedanken der Völker."],[11,"Aber der Ratschluss des HERRN bleibt ewiglich, seines Herzens Gedanken für und für."],[12,"Wohl dem Volk, dessen Gott der HERR ist, dem Volk, das er zum Erbe erwählt hat!"],[13,"Der HERR schaut vom Himmel und sieht alle Menschenkinder."],[14,"Vom Ort, da er wohnt, blickt er auf alle Bewohner der Erde:"],[15,"er, der ihre Herzen insgesamt gemacht hat, der auf alle ihre Werke merkt."],[16,"Einem König hilft nicht seine große Heeresmacht, ein Held wird nicht errettet durch seine große Kraft."],[17,"Rosse helfen nichts zur Rettung, und ihre große Stärke rettet nicht."],[18,"Aber die Augen des HERRN sehen auf die, die ihn fürchten, die auf seine Güte hoffen,"],[19,"dass er ihre Seele vom Tode errette und sie am Leben erhalte in Hungersnot."],[20,"Wir harren auf den HERRN; er ist uns Hilfe und Schild."],[21,"Denn unser Herz freut sich seiner, und wir trauen auf seinen heiligen Namen."],[22,"Deine Güte, HERR, sei über uns, wie wir auf dich hoffen."]]};
+
+PSALMEN[34]={sup:"Von David, als er sich wahnsinnig stellte vor Abimelech und dieser ihn fortjagte und er wegging.",v:[[1,"Ich will den HERRN loben allezeit; sein Lob soll immerdar in meinem Munde sein."],[2,"Meine Seele soll sich rühmen des HERRN, dass es die Elenden hören und sich freuen."],[3,"Preiset den HERRN mit mir und lasst uns seinen Namen miteinander erheben!"],[4,"Ich suchte den HERRN, und er antwortete mir und errettete mich aus aller meiner Furcht."],[5,"Die auf ihn blicken, werden erleuchtet, und ihr Angesicht soll nicht schamrot werden."],[6,"Als dieser Elende rief, hörte der HERR und half ihm aus allen seinen Nöten."],[7,"Der Engel des HERRN lagert sich um die her, die ihn fürchten, und hilft ihnen heraus."],[8,"Schmecket und sehet, wie freundlich der HERR ist! Wohl dem, der auf ihn trauet!"],[9,"Fürchtet den HERRN, ihr seine Heiligen! Denn die ihn fürchten, haben keinen Mangel."],[10,"Die Jungen müssen darben und hungern; aber die den HERRN suchen, haben keinen Mangel an irgend einem Gut."],[11,"Kommt, Kinder, höret mich! Ich will euch die Furcht des HERRN lehren."],[12,"Wer ist der Mensch, der Lust hat am Leben, der gern viele Tage sähe, dass er Gutes genösse?"],[13,"Behüte deine Zunge vor Bösem und deine Lippen, dass sie keine Falschheit reden!"],[14,"Lass vom Bösen und tue Gutes; suche Frieden und jage ihm nach!"],[15,"Die Augen des HERRN sehen auf die Gerechten, und seine Ohren sind auf ihr Schreien."],[16,"Das Antlitz des HERRN aber ist gegen die, die Böses tun, dass er ihr Gedächtnis von der Erde vertilge."],[17,"Wenn die Gerechten schreien, so hört der HERR und errettet sie aus all ihrer Not."],[18,"Der HERR ist nahe denen, die zerbrochenen Herzens sind, und hilft denen, die ein zerschlagenes Gemüt haben."],[19,"Der Gerechte muss viel leiden; aber der HERR hilft ihm aus dem allen."],[20,"Er bewahrt alle seine Knochen, dass nicht eines davon zerbrochen wird."],[21,"Den Gottlosen tötet das Unglück, und die den Gerechten hassen, kommen um."],[22,"Der HERR erlöset die Seele seiner Knechte, und alle, die auf ihn trauen, kommen nicht um."]]};
+
+PSALMEN[40]={sup:"Dem Chorleiter. Ein Psalm Davids.",v:[[1,"Ich harrte des HERRN, und er neigte sich zu mir und hörte mein Schreien."],[2,"Er zog mich aus der grauenvollen Grube, aus dem Schlamm und Morast, und stellte meine Füße auf einen Felsen und machte meinen Gang fest."],[3,"Er hat mir ein neues Lied in meinen Mund gegeben, ein Loblied unserm Gott. Das werden viele sehen und sich fürchten und auf den HERRN vertrauen."],[4,"Wohl dem, dessen Hoffnung der HERR ist, wer sich nicht wendet zu den Stolzen und zu den Lügnern."],[5,"Herr, mein Gott, viele sind deine Wunder und deine Gedanken, die du für uns hast; niemand ist dir gleich. Ich will sie verkündigen und davon reden; doch sind sie zu viele, um sie zu zählen."],[6,"Schlachtopfer und Speisopfer gefallen dir nicht – die Ohren hast du mir aufgetan –, Brandopfer und Sündopfer forderst du nicht."],[7,"Da sprach ich: Siehe, ich komme! Im Buch ist von mir geschrieben:"],[8,"Deinen Willen, mein Gott, tue ich gern, und dein Gesetz hab ich in meinem Herzen."],[9,"Ich verkündige Gerechtigkeit in großer Gemeinde; siehe, ich halte meinen Mund nicht zurück, HERR, du weißt es."],[10,"Deine Gerechtigkeit verberge ich nicht in meinem Herzen, ich rede von deiner Treue und Hilfe, ich schweige nicht von deiner Güte und Wahrheit in großer Gemeinde."],[11,"Du, HERR, wirst deine Barmherzigkeit von mir nicht wenden; deine Güte und Treue werden mich allezeit behüten."],[12,"Denn es umringen mich Übel ohne Zahl; meine Sünden haben mich ergriffen, dass ich nicht mehr sehen kann. Sie sind mehr als Haare auf meinem Haupt, und mein Herz hat mich verlassen."],[13,"Gefalle es dir, HERR, mich zu erretten! HERR, eile, mir zu helfen!"],[14,"Die da trachten, mein Leben zu nehmen, sollen allesamt beschämt und zuschanden werden; die mir Böses gönnen, sollen weichen und zuschanden werden."],[17,"Aber alle, die dich suchen, sollen sich freuen und in dir fröhlich sein; und die dein Heil lieben, sollen sagen immerdar: »Der HERR ist groß!«"],[18,"Ich aber bin elend und arm; der Herr aber sorgt für mich. Du bist mein Helfer und Erretter; mein Gott, verzögere nicht!"]]};
+
+PSALMEN[42]={sup:"Ein Maskil. Für die Nachkommen Korachs. Dem Chorleiter.",v:[[1,"Wie der Hirsch schreit nach frischem Wasser, so schreit meine Seele, Gott, zu dir."],[2,"Meine Seele dürstet nach Gott, nach dem lebendigen Gott. Wann werde ich dahin kommen, dass ich Gottes Angesicht schaue?"],[3,"Meine Tränen sind meine Speise Tag und Nacht, weil man täglich zu mir sagt: Wo ist nun dein Gott?"],[4,"Daran will ich denken und mein Herz ausschütten: wie ich einherzog mit dem Haufen und mit ihnen wallfahrte zum Haus Gottes mit Freudengeschrei und Lobgesang in der Menge, die Feste feierte."],[5,"Was betrübst du dich, meine Seele, und bist so unruhig in mir? Harre auf Gott; denn ich werde ihm noch danken, dass er mir hilft mit seinem Angesicht."],[6,"Mein Gott, meine Seele ist betrübt; darum gedenke ich an dich im Lande am Jordan und Hermon, auf dem kleinen Berge."],[7,"Deine Fluten rauschen dahin, eine Tiefe ruft die andere; alle deine Wasserwogen und Wellen gehen über mich."],[8,"Der HERR gebietet am Tage seiner Güte, und des Nachts ist sein Lied bei mir, ein Gebet zu dem Gott meines Lebens."],[9,"Ich sage zu Gott, meinem Fels: Warum hast du mich vergessen? Warum muss ich so traurig gehen, wenn mein Feind mich drängt?"],[10,"Meine Gebeine werden zerschlagen, wenn mich meine Feinde schmähen und täglich zu mir sagen: Wo ist nun dein Gott?"],[11,"Was betrübst du dich, meine Seele, und bist so unruhig in mir? Harre auf Gott; denn ich werde ihm noch danken, dass er meines Angesichts Hilfe und mein Gott ist."]]};
+
+PSALMEN[43]={sup:"",v:[[1,"Schaffe mir Recht, Gott, und führe meine Sache wider ein treuloses Volk; errette mich von den bösen und ungerechten Menschen!"],[2,"Denn du bist der Gott meiner Zuflucht; warum hast du mich verworfen? Warum muss ich so traurig gehen, wenn mein Feind mich drängt?"],[3,"Sende dein Licht und deine Wahrheit, dass sie mich leiten und bringen auf deinen heiligen Berg und zu deiner Wohnung,"],[4,"dass ich hingehe zum Altar Gottes, zu dem Gott, der meine Freude und Wonne ist, und dir danke mit der Harfe, Gott, mein Gott."],[5,"Was betrübst du dich, meine Seele, und bist so unruhig in mir? Harre auf Gott; denn ich werde ihm noch danken, dass er meines Angesichts Hilfe und mein Gott ist."]]};
+
+PSALMEN[46]={sup:"Für die Nachkommen Korachs. Ein Lied. Nach der Weise »Jungfrauen«.",v:[[1,"Gott ist unsre Zuversicht und Stärke, eine Hilfe in den großen Nöten, die uns getroffen haben."],[2,"Darum fürchten wir uns nicht, wenngleich die Welt unterginge und die Berge mitten ins Meer sänken,"],[3,"wenngleich das Meer wütete und wallte und von seinem Ungestüm die Berge einfielen."],[4,"Dennoch soll die Stadt Gottes fein lustig bleiben mit ihren Brünnlein, da die heiligen Wohnungen des Höchsten sind."],[5,"Gott ist bei ihr drinnen, darum wird sie fest bleiben; Gott hilft ihr früh am Morgen."],[6,"Die Heiden müssen verzagen, die Königreiche fallen; wenn er seine Stimme erhebt, so zerschmilzt die Erde."],[7,"Der HERR Zebaoth ist mit uns; der Gott Jakobs ist unser Schutz."],[8,"Kommt, schauet an die Werke des HERRN, der auf Erden solch ein Zerstören anrichtet:"],[9,"er schafft Kriegen ein Ende in aller Welt; er zerbricht Bogen und Spieße und verbrennt die Kriegswagen mit Feuer."],[10,"»Seid stille und erkennet, dass ich Gott bin! Ich will hochgehalten werden unter den Heiden, ich will hochgehalten werden auf Erden.«"],[11,"Der HERR Zebaoth ist mit uns; der Gott Jakobs ist unser Schutz."]]};
+
+PSALMEN[47]={sup:"Für die Nachkommen Korachs. Ein Psalm.",v:[[1,"Ihr Völker alle, klatscht in die Hände, jauchzet Gott mit fröhlichem Schall!"],[2,"Denn der HERR, der Höchste, ist zu fürchten, ein großer König über die ganze Erde."],[3,"Er bringt die Völker unter uns und setzt die Nationen uns zu Füßen."],[4,"Er erwählt für uns unser Erbteil, den Stolz Jakobs, den er liebt."],[5,"Gott fährt auf mit Jauchzen und der HERR beim Schall der Posaune."],[6,"Lobsinget Gott, lobsinget! Lobsinget unserm König, lobsinget!"],[7,"Denn Gott ist König über die ganze Erde; lobsinget mit Verständnis!"],[8,"Gott ist König über die Völker; Gott sitzt auf seinem heiligen Thron."],[9,"Die Fürsten der Völker sind versammelt als das Volk des Gottes Abrahams; denn Gott gehören die Schilde der Erde; er ist sehr erhaben."]]};
+
+PSALMEN[51]={sup:"Dem Chorleiter. Ein Psalm Davids, als der Prophet Nathan zu ihm kam, nachdem er zu Batseba eingegangen war.",v:[[1,"Gott, sei mir gnädig nach deiner Güte, und tilge meine Sünden nach deiner großen Barmherzigkeit."],[2,"Wasche mich rein von meiner Missetat, und reinige mich von meiner Sünde."],[3,"Denn ich erkenne meine Missetat, und meine Sünde ist immer vor mir."],[4,"An dir allein habe ich gesündigt und übel vor dir getan, auf dass du recht behaltest in deinen Worten und rein dastehst, wenn du gerichtet wirst."],[5,"Siehe, ich bin in Schuld geboren, und meine Mutter hat mich in Sünde empfangen."],[6,"Aber du hast Gefallen an Wahrheit in den Nieren und lehrst mich Weisheit im Verborgenen."],[7,"Entsündige mich mit Ysop, dass ich rein werde; wasche mich, dass ich weißer werde als Schnee."],[8,"Lass mich Freude und Wonne hören, dass die Gebeine fröhlich werden, die du zerschlagen hast."],[9,"Verbirg dein Angesicht vor meinen Sünden, und tilge alle meine Missetat."],[10,"Schaffe in mir, Gott, ein reines Herz und gib mir einen neuen, beständigen Geist."],[11,"Verwirf mich nicht von deinem Angesicht, und nimm deinen Heiligen Geist nicht von mir."],[12,"Erfreue mich wieder mit deiner Hilfe, und mit einem willigen Geist rüste mich aus."],[13,"Ich will die Übertreter deine Wege lehren, dass sich die Sünder zu dir bekehren."],[14,"Errette mich von den Blutschulden, Gott, der du mein Gott und Heiland bist, dass meine Zunge deine Gerechtigkeit rühme."],[15,"Herr, tu meine Lippen auf, dass mein Mund deinen Ruhm verkündige."],[16,"Denn Schlachtopfer willst du nicht, ich würde sie dir gerne geben, und Brandopfer gefallen dir nicht."],[17,"Die Opfer, die Gott gefallen, sind ein geängsteter Geist; ein geängstetes, zerschlagenes Herz wirst du, Gott, nicht verachten."],[18,"Tue wohl an Zion nach deiner Gnade; baue die Mauern Jerusalems."],[19,"Dann werden dir gefallen die rechten Opfer, Brandopfer und Ganzopfer; dann wird man Farren auf deinem Altar opfern."]]};
+
+PSALMEN[62]={sup:"Dem Chorleiter. Nach Art des Jedutun. Ein Psalm Davids.",v:[[1,"Meine Seele ist stille zu Gott, der mir hilft."],[2,"Er ist mein Fels, meine Hilfe, mein Schutz, dass ich gewiss nicht fallen werde."],[3,"Wie lange wollt ihr einem Menschen nachstellen und ihn alle miteinander umbringen wie eine wankende Wand oder einen eingestoßenen Zaun?"],[4,"Sie wollen ihn nur von seiner Höhe stoßen und freuen sich an der Lüge. Sie segnen mit ihrem Mund, aber in ihrem Herzen fluchen sie."],[5,"Sei doch stille zu Gott, meine Seele; denn er ist meine Hoffnung."],[6,"Er ist mein Fels, meine Hilfe, mein Schutz, dass ich nicht fallen werde."],[7,"Bei Gott ist mein Heil und meine Ehre; der Fels meiner Stärke, meine Zuflucht ist bei Gott."],[8,"Hoffet auf ihn allezeit, liebe Leute, schüttet euer Herz vor ihm aus; Gott ist unsre Zuversicht."],[9,"Ja, die Menschenkinder sind nichts, die Menschen sind eine Lüge; auf der Waage steigen sie allesamt empor, sie sind leichter als nichts."],[10,"Verlasset euch nicht auf Unrecht und hoffet nicht auf Raub; wenn Reichtum zunimmt, so hänget euer Herz nicht daran."],[11,"Gott hat einmal geredet, und ich habe zweierlei gehört: dass Gott stark ist"],[12,"und dass du, Herr, gütig bist. Denn du vergiltst einem jeden nach seinem Werk."]]};
+
+PSALMEN[63]={sup:"Ein Psalm Davids, als er in der Wüste Juda war.",v:[[1,"Gott, du mein Gott, den ich so früh suche: Meine Seele dürstet nach dir; mein Fleisch sehnt sich nach dir in einem trockenen und dürren Land, wo kein Wasser ist."],[2,"So hab ich dich im Heiligtum geschaut und deine Stärke und Herrlichkeit gesehen."],[3,"Denn deine Güte ist besser als Leben; meine Lippen werden dich rühmen."],[4,"So will ich dich loben mein Leben lang und meine Hände aufheben in deinem Namen."],[5,"Meine Seele ist satt wie von Mark und Fett, und mein Mund lobt dich mit fröhlichen Lippen,"],[6,"wenn ich auf dich denke auf meinem Lager und dein in den Nachtwachen gedenke;"],[7,"denn du bist mir eine Hilfe gewesen, und ich bin fröhlich unter dem Schatten deiner Flügel."],[8,"Meine Seele hängt an dir; deine rechte Hand hält mich."],[9,"Aber die suchen mich, mir die Seele zu nehmen, sie sollen kommen in die Tiefen der Erde."],[10,"Man soll sie dem Schwert übergeben; sie sollen ein Raub der Schakale werden."],[11,"Aber der König wird sich freuen in Gott; und alle, die bei ihm schwören, werden sich rühmen, denn den Lügnern wird der Mund gestopft."]]};
+
+PSALMEN[65]={sup:"Ein Psalm Davids. Ein Lied. Dem Chorleiter.",v:[[1,"Gott, man lobet dich in der Stille zu Zion, und dir bezahlet man Gelübde."],[2,"Du erhörest das Gebet; darum kommt alles Fleisch zu dir."],[3,"Unsre Missetaten drücken uns zu Boden; du vergibst uns unsre Übertretungen."],[4,"Wohl dem, den du erwählest und zu dir nimmst, dass er in deinen Vorhöfen wohne! Der wird satt von den Gütern deines Hauses, dem heiligen Tempel."],[5,"Mit Wundertaten erhörst du uns in Gerechtigkeit, Gott, unser Heiland, du Zuversicht aller Welt und der fernen Meere."],[6,"Du stellst die Berge fest mit deiner Kraft und bist gerüstet mit Stärke."],[7,"Du stehst dem Brausen des Meeres, dem Brausen seiner Wellen, auch dem Toben der Völker."],[8,"Wer an den Enden der Welt wohnt, muss sich fürchten vor deinen Zeichen. Du machst froh, die im Morgenland und Abendland wohnen."],[9,"Du nimmst dich der Erde an und tränkest sie, du machst sie sehr reich; der Strom Gottes hat Wasser in Fülle; du bereitest ihr Korn, denn so bereitest du sie:"],[10,"Du tränkest ihre Furchen, ebnest ihre Schollen, erweichst sie mit Regen, segnest ihre Saat."],[11,"Du krönest das Jahr mit deiner Güte, und deine Fußstapfen triefen von Fett."],[12,"Es triefen die Weiden der Wüste, und die Berge schürzen sich mit Freuden."],[13,"Die Triften sind voll Schafe, und die Täler stehen voll Korn; sie jauchzen und singen."]]};
+
+PSALMEN[66]={sup:"Ein Lied. Ein Psalm. Dem Chorleiter.",v:[[1,"Jauchzet Gott, alle Lande!"],[2,"Lobsinget der Herrlichkeit seines Namens; verherrlicht ihn mit Lob!"],[3,"Sagt zu Gott: Wie wunderbar sind deine Werke! Vor deiner großen Kraft müssen deine Feinde sich beugen."],[4,"Alle Welt bete dich an und lobsinge dir; sie lobsinge deinem Namen."],[5,"Kommt und sehet die Werke Gottes, der so wunderbar ist in seinem Tun an den Menschenkindern:"],[6,"Er verwandelte das Meer in trockenes Land; sie gingen zu Fuß durch den Strom. Dort freuten wir uns über ihn."],[7,"Er herrscht durch seine Macht ewiglich; er sieht auf die Heiden; die Abtrünnigen sollen sich nicht erheben."],[8,"Lobet, ihr Völker, unsern Gott und lasst seinen Ruhm erschallen;"],[9,"der unsre Seele am Leben erhält und lässt unsern Fuß nicht gleiten."],[10,"Du hast uns geprüft, Gott, du hast uns geläutert, wie man Silber läutert."],[11,"Du hast uns in den Kerker geführt und uns ein Joch auf unsern Rücken gelegt."],[12,"Du ließest Menschen über unsre Häupter fahren; wir kamen in Feuer und Wasser; aber du führtest uns heraus in die Freiheit."],[13,"Ich will in dein Haus gehen mit Brandopfern und dir meine Gelübde bezahlen,"],[14,"die meine Lippen gelobt und mein Mund geredet hat in meiner Not."],[15,"Fette Brandopfer will ich dir opfern mit Rauch von Widdern; ich will dir Rinder und Böcke opfern."],[16,"Kommt, höret, alle, die ihr Gott fürchtet; ich will erzählen, was er mir Gutes getan hat."],[17,"Zu ihm rief ich mit meinem Munde und pries ihn mit meiner Zunge."],[18,"Wenn ich Unrechtes im Herzen bedenke, so hört der Herr nicht."],[19,"Aber Gott hat gehört und hat aufgemerkt auf die Stimme meines Gebets."],[20,"Gelobet sei Gott, der mein Gebet nicht verworfen und seine Güte nicht von mir gewendet hat."]]};
+
+PSALMEN[67]={sup:"Dem Chorleiter. Mit Saiteninstrumenten. Ein Psalm. Ein Lied.",v:[[1,"Gott sei uns gnädig und segne uns, er lasse sein Angesicht leuchten über uns,"],[2,"dass wir auf Erden seinen Weg erkennen, unter allen Heiden sein Heil."],[3,"Es danken dir, Gott, die Völker, es danken dir alle Völker."],[4,"Die Nationen freuen sich und jauchzen, dass du die Völker recht richtest und die Nationen auf Erden leitest."],[5,"Es danken dir, Gott, die Völker, es danken dir alle Völker."],[6,"Das Land gibt seinen Gewächs; Gott, unser Gott, segnet uns."],[7,"Gott segnet uns, und alle Welt fürchte ihn."]]};
+
+PSALMEN[69]={sup:"Dem Chorleiter. Nach der Weise »Lilien«. Von David.",v:[[1,"Hilf mir, Gott! Das Wasser geht mir bis an die Kehle."],[2,"Ich versinke in tiefem Schlamm, wo kein Grund ist; ich bin in tiefes Wasser geraten, und die Flut will mich ersäufen."],[3,"Ich bin müde vom Schreien; meine Kehle ist heiser. Meine Augen sind trübe geworden, weil ich so lange harren muss auf meinen Gott."],[4,"Es sind mehr, die mich ohne Grund hassen, als Haare auf meinem Haupte; die mir feind sind und mich fälschlich überwältigen wollen, sind mächtig. Was ich nicht geraubt habe, muss ich erstatten."],[5,"Gott, du weißt meine Torheit, und meine Schuld ist dir nicht verborgen."],[6,"Lass um meinetwillen nicht zuschanden werden, die auf dich harren, Herr, HERR Zebaoth; lass mich nicht zum Schandfleck werden, die dich suchen, Gott Israels."],[9,"Denn um deines Hauses willen hat mich der Eifer verzehrt, und die Schmähungen derer, die dich schmähen, sind auf mich gefallen."],[13,"Ich aber bete zu dir, HERR, zur Zeit der Gnade; Gott, in deiner großen Güte erhöre mich, in deiner treuen Hilfe."],[14,"Errette mich aus dem Schlamm, dass ich nicht versinke; lass mich errettet werden von denen, die mich hassen, und aus dem tiefen Wasser,"],[16,"Erhöre mich, HERR, denn deine Güte ist treu; wende dich zu mir nach deiner großen Barmherzigkeit."],[29,"Ich aber bin elend und voller Schmerzen; Gott, deine Hilfe schütze mich!"],[30,"Ich will den Namen Gottes loben mit einem Lied und ihn preisen mit Danksagung."],[33,"Denn der HERR hört die Armen und verachtet seine Gefangenen nicht."],[34,"Himmel und Erde sollen ihn loben, die Meere und alles, was sich in ihnen regt."]]};
+
+PSALMEN[71]={sup:"",v:[[1,"Auf dich, HERR, traue ich; lass mich nimmermehr zuschanden werden."],[2,"Errette mich durch deine Gerechtigkeit und befreie mich; neige dein Ohr zu mir und hilf mir!"],[3,"Sei mir ein Fels des Heils, zu dem ich immer flüchten kann. Du hast beschlossen, mir zu helfen; denn mein Fels und meine Burg bist du."],[4,"Mein Gott, befreie mich aus der Hand des Gottlosen, aus der Faust des Ungerechten und Grausamen."],[5,"Denn du, Herr HERR, bist meine Hoffnung und mein Vertrauen von meiner Jugend an."],[6,"Auf dich habe ich mich gestützt vom Mutterleib an; du hast mich aus meiner Mutter Leib herausgezogen. Dir gilt mein Lob beständig."],[14,"Ich aber will immer harren und dein Lob immer mehr mehren."],[15,"Mein Mund wird deine Gerechtigkeit und täglich dein Heil verkündigen; ich kann sie nicht aufzählen."],[17,"Gott, du hast mich gelehrt von meiner Jugend an, und noch heute verkündige ich deine Wunder."],[18,"Auch wenn ich alt und grau bin, Gott, verlass mich nicht, bis ich deinen Arm der kommenden Geschlechter verkündige und deine Macht allen, die noch kommen werden."]]};
+
+PSALMEN[72]={sup:"Von Salomo.",v:[[1,"Gott, gib dem König dein Gericht und deine Gerechtigkeit dem Königssohn,"],[2,"dass er dein Volk richte mit Gerechtigkeit und deine Elenden mit Recht."],[3,"So werden die Berge Frieden tragen für das Volk und die Hügel Gerechtigkeit."],[4,"Er wird den Elenden im Volk zum Recht verhelfen und den Kindern des Armen helfen und den Bedrücker demütigen."],[5,"Er wird fortdauern, solange Sonne und Mond bestehen, von Geschlecht zu Geschlecht."],[6,"Er wird herniederkommen wie Regen auf die Wiesen, wie Regentropfen, die das Land befeuchten."],[7,"Zu seinen Zeiten wird Gerechtigkeit blühen und Friede in Fülle, bis der Mond nicht mehr ist."],[8,"Er wird herrschen von Meer zu Meer, vom Strom bis an die Enden der Erde."],[9,"Vor ihm werden die Nomaden knien, und seine Feinde werden den Staub lecken."],[10,"Die Könige von Tarsis und von den Inseln werden Geschenke bringen, die Könige von Scheba und Saba werden Gaben darbringen."],[11,"Alle Könige werden vor ihm niederfallen, alle Völker werden ihm dienen."],[12,"Denn er wird den Armen, der um Hilfe schreit, erretten und den Elenden, der keinen Helfer hat."],[13,"Er wird Erbarmen haben mit dem Schwachen und Armen und die Seelen der Armen retten."],[14,"Von Bedrückung und Gewalt wird er ihre Seele befreien, und ihr Blut gilt ihm viel."],[17,"Sein Name soll ewig bleiben; solange die Sonne scheint, soll sein Name fortbestehen. In ihm sollen sich segnen alle Völker und ihn glücklich preisen."],[18,"Gelobet sei der HERR Gott, der Gott Israels, der allein Wunder tut."],[19,"Und gelobet sei sein herrlicher Name ewiglich, und alle Lande sollen seiner Ehre voll werden. Amen, Amen."]]};
+
+/* PSALMEN DATENBANK TEIL 2 — Lutherbibel 1984 — Ps 80–150 */
+
+PSALMEN[80]={sup:"Dem Chorleiter. Nach der Weise »Lilien«. Ein Zeugnis. Für die Nachkommen Korachs. Ein Psalm.",v:[[1,"Du Hirt Israels, höre, der du Josef hütest wie eine Herde. Der du über den Cherubim thronst, erscheine"],[2,"vor Ephraim, Benjamin und Manasse! Erwecke deine Kraft und komm uns zu Hilfe!"],[3,"Gott, stelle uns wieder her und lass dein Angesicht leuchten, so genesen wir."],[4,"HERR, Gott Zebaoth, wie lange willst du zürnen, während dein Volk zu dir betet?"],[5,"Du speisest sie mit Tränenbrot und tränkest sie mit Tränen in großem Maß."],[6,"Du lässt uns ein Zankapfel sein für unsre Nachbarn, und unsre Feinde spotten unser."],[7,"Gott Zebaoth, stelle uns wieder her und lass dein Angesicht leuchten, so genesen wir."],[8,"Du hast einen Weinstock aus Ägypten geholt und hast die Heiden vertrieben und ihn gepflanzt."],[9,"Du hast Raum vor ihm gemacht, und er hat Wurzeln geschlagen und das Land erfüllt."],[10,"Die Berge bedeckte sein Schatten und die Zedern Gottes seine Ranken."],[11,"Er breitete seine Ranken aus bis ans Meer und seine Schösslinge bis an den Strom."],[12,"Warum hast du seine Mauern niedergebrochen, dass ihn alle Vorübergehenden abpflücken?"],[13,"Der Eber aus dem Walde verwüstet ihn, und was auf dem Felde lebt, frisst ihn ab."],[14,"Gott Zebaoth, wende dich doch! Schaue vom Himmel und sieh und besuche diesen Weinstock"],[15,"und den Stamm, den deine Rechte gepflanzt hat, und den Sohn, den du dir großgezogen hast!"],[19,"HERR, Gott Zebaoth, stelle uns wieder her und lass dein Angesicht leuchten, so genesen wir."]]};
+
+PSALMEN[84]={sup:"Dem Chorleiter. Nach der Weise »Über die Kelter«. Für die Nachkommen Korachs. Ein Psalm.",v:[[1,"Wie lieblich sind deine Wohnungen, HERR Zebaoth!"],[2,"Meine Seele verlangt und sehnt sich nach den Vorhöfen des HERRN; mein Herz und Leib freuen sich in dem lebendigen Gott."],[3,"Der Sperling findet ein Haus und die Schwalbe ihr Nest, wo sie ihre Jungen hinlegt: an deinen Altären, HERR Zebaoth, mein König und mein Gott."],[4,"Wohl denen, die in deinem Hause wohnen; die loben dich immerdar."],[5,"Wohl dem Menschen, dessen Kraft du bist, der von Herzen dir nachwandert!"],[6,"Wenn die im Tal der Bäche pilgern, wird es zum Quellgrund; auch Frühregen hüllt es in Segen."],[7,"Sie gehen von einer Kraft zur anderen und erscheinen vor Gott auf Zion."],[8,"HERR, Gott Zebaoth, höre mein Gebet; vernimm es, Gott Jakobs!"],[9,"Gott, unser Schild, schau doch; sieh an das Angesicht deines Gesalbten!"],[10,"Denn ein Tag in deinen Vorhöfen ist besser als sonst tausend. Ich will lieber an der Schwelle stehen in meines Gottes Hause, als wohnen in den Zelten der Gottlosen."],[11,"Denn Gott der HERR ist Sonne und Schild; der HERR gibt Gnade und Ehre; er wird kein Gutes mangeln lassen den Frommen."],[12,"HERR Zebaoth, wohl dem Menschen, der sich auf dich verlässt!"]]};
+
+PSALMEN[85]={sup:"Dem Chorleiter. Für die Nachkommen Korachs. Ein Psalm.",v:[[1,"HERR, du bist gnädig gewesen deinem Lande und hast das Geschick Jakobs gewendet."],[2,"Du hast die Schuld deines Volkes vergeben und alle ihre Sünden bedeckt."],[3,"Du hast allen deinen Grimm zurückgenommen und dich von deiner grimmigen Zornglut abgewandt."],[4,"Gott, unser Heiland, hilf uns und lass ab von deinem Unwillen über uns!"],[5,"Willst du denn ewiglich zürnen und deinen Zorn walten lassen für und für?"],[6,"Willst du uns nicht wieder erquicken, dass dein Volk sich über dich freuen kann?"],[7,"HERR, zeige uns deine Güte und gib uns deinen Heiland!"],[8,"Ich will hören, was Gott redet: Frieden verheißt er seinem Volk und seinen Heiligen, nur dass sie sich nicht wieder zur Torheit wenden."],[9,"Doch ist nahe sein Heil denen, die ihn fürchten, dass seine Herrlichkeit in unserm Lande wohne."],[10,"Güte und Treue werden sich begegnen, Gerechtigkeit und Friede werden sich küssen."],[11,"Treue wird aus der Erde sprießen, und Gerechtigkeit wird vom Himmel schauen."],[12,"Auch wird der HERR Gutes geben, und unser Land wird seine Frucht geben."],[13,"Gerechtigkeit wird vor ihm hergehen und seinen Schritten folgen."]]};
+
+PSALMEN[88]={sup:"Ein Lied. Ein Psalm. Für die Nachkommen Korachs. Dem Chorleiter. Nach der Weise »Leiden«. Ein Maskil Hemans, des Esrachiters.",v:[[1,"HERR, Gott, mein Heiland, ich schreie Tag und Nacht vor dir."],[2,"Lass mein Gebet vor dich kommen; neige dein Ohr zu meinem Flehen!"],[3,"Denn ich bin voll Kummer, und mein Leben ist nah beim Totenreich."],[4,"Ich werde zu denen gezählt, die in die Grube fahren; ich bin wie ein Mann, dem keine Kraft mehr bleibt,"],[5,"losgelassen unter den Toten wie die Erschlagenen, die im Grabe liegen, derer du nicht mehr gedenkst und die von deiner Hand geschieden sind."],[6,"Du hast mich in die tiefste Grube gelegt, in Finsternisse, in die Tiefe."],[7,"Dein Grimm liegt schwer auf mir, und du ängstigst mich mit allen deinen Fluten."],[8,"Meine Bekannten hast du ferne von mir gemacht und mich ihnen ein Gräuel; ich bin eingeschlossen und komme nicht heraus."],[13,"Aber ich schreie, HERR, zu dir und mein Gebet kommt früh zu dir."],[14,"HERR, warum verstößt du mich und verbirgst dein Angesicht vor mir?"],[18,"Mein Freund und Nächster – du hast sie ferne von mir gestoßen, meine Bekannten in die Finsternis."]]};
+
+PSALMEN[90]={sup:"Ein Gebet Moses, des Mannes Gottes.",v:[[1,"Herr, du bist unsre Zuflucht für und für."],[2,"Ehe denn die Berge wurden und die Erde und die Welt erschaffen wurden, bist du, Gott, von Ewigkeit zu Ewigkeit."],[3,"Du lässt die Menschen zurückkehren zum Staub und sprichst: Kommt wieder, Menschenkinder!"],[4,"Denn tausend Jahre sind vor dir wie der Tag, der gestern vergangen ist, und wie eine Nachtwache."],[5,"Du lässt die Menschen dahinfahren wie einen Strom; sie sind wie ein Schlaf, wie Gras, das am Morgen noch aufgeht:"],[6,"Am Morgen blüht es und wächst auf, des Abends welkt es und verdorrt."],[7,"Das macht dein Zorn, dass wir so vergehen, und dein Grimm, dass wir so plötzlich dahin müssen."],[8,"Denn unsre Missetaten stellst du vor dich, unsre Sünden das Licht deines Angesichts."],[9,"Darum fahren alle unsre Tage dahin durch deinen Zorn, wir bringen unsre Jahre zu wie ein Seufzen."],[10,"Unser Leben währet siebzig Jahre, und wenn's hoch kommt, so sind's achtzig Jahre, und wenn's köstlich gewesen ist, so ist es Mühe und Arbeit gewesen; denn es fährt schnell dahin, als flögen wir davon."],[11,"Wer glaubt's aber, dass du so sehr zürnst, und wer fürchtet sich so sehr vor deinem Grimm?"],[12,"Lehre uns bedenken, dass wir sterben müssen, auf dass wir klug werden."],[13,"HERR, kehre dich doch wieder zu uns! Sei deinen Knechten gnädig!"],[14,"Fülle uns früh mit deiner Gnade, so wollen wir rühmen und fröhlich sein unser Leben lang."],[17,"Und der Herr, unser Gott, sei uns freundlich und fördere das Werk unsrer Hände bei uns. Ja, das Werk unsrer Hände wollest du fördern!"]]};
+
+PSALMEN[91]={sup:"",v:[[1,"Wer unter dem Schirm des Höchsten sitzt und unter dem Schatten des Allmächtigen bleibt,"],[2,"der spricht zu dem HERRN: Meine Zuversicht und meine Burg, mein Gott, auf den ich hoffe."],[3,"Er errettet dich vom Strick des Jägers und von der schädlichen Pest."],[4,"Er wird dich mit seinen Fittichen decken, und Zuflucht wirst du haben unter seinen Flügeln; seine Wahrheit ist Schirm und Schild."],[5,"Dich soll nicht erschrecken das Grauen der Nacht, der Pfeil, der des Tages fliegt,"],[6,"die Pest, die im Finstern schleicht, die Seuche, die am Mittag verderbt."],[7,"Ob tausend fallen zu deiner Seite und zehntausend zu deiner Rechten, so wird es doch dich nicht treffen."],[8,"Ja, mit deinen Augen wirst du es schauen und sehen, wie es den Gottlosen vergolten wird."],[9,"Denn der HERR ist deine Zuversicht, du hast den Höchsten zu deiner Behausung gemacht."],[10,"Es wird dir kein Übel begegnen, und keine Plage wird zu deiner Hütte sich nahen."],[11,"Denn er hat seinen Engeln befohlen, dass sie dich behüten auf allen deinen Wegen,"],[12,"dass sie dich auf den Händen tragen und du deinen Fuß nicht an einen Stein stoßest."],[13,"Du wirst auf Löwen und Ottern gehen und junge Löwen und Drachen zertreten."],[14,"»Er liebt mich, darum will ich ihn erretten; er kennt meinen Namen, darum will ich ihn schützen."],[15,"Wenn er mich anruft, will ich ihn erhören; ich bin bei ihm in der Not, ich will ihn herausreißen und zu Ehren bringen."],[16,"Ich will ihn sättigen mit langem Leben und will ihm zeigen mein Heil.«"]]};
+
+PSALMEN[95]={sup:"",v:[[1,"Kommt, lasst uns dem HERRN frohlocken und jubeln dem Fels unsres Heils!"],[2,"Lasst uns mit Dank vor sein Angesicht treten und mit Psalmen ihm jubeln!"],[3,"Denn der HERR ist ein großer Gott und ein großer König über alle Götter."],[4,"In seiner Hand sind die Tiefen der Erde, und die Gipfel der Berge sind sein."],[5,"Das Meer ist sein, und er hat es gemacht, und seine Hände haben das trockene Land bereitet."],[6,"Kommt, lasst uns anbeten und knien und niederflehen vor dem HERRN, der uns gemacht hat."],[7,"Denn er ist unser Gott, und wir sind das Volk seiner Weide und die Schafe seiner Hand."],[8,"Heute, wenn ihr seine Stimme hört, verstocket eure Herzen nicht wie zu Meriba, wie am Tage von Massa in der Wüste,"],[9,"wo eure Väter mich versuchten, mich prüften, obwohl sie doch meine Werke sahen."],[10,"Vierzig Jahre war ich verdrossen über dieses Geschlecht und sprach: Es ist ein Volk, das in seinem Herzen irrt, und sie wissen nichts von meinen Wegen;"],[11,"darum schwor ich in meinem Zorn: Sie sollen nicht in meine Ruhe kommen."]]};
+
+PSALMEN[96]={sup:"",v:[[1,"Singet dem HERRN ein neues Lied, singet dem HERRN, alle Welt!"],[2,"Singet dem HERRN und lobet seinen Namen, verkündigt sein Heil von Tag zu Tag!"],[3,"Erzählet unter den Heiden seine Ehre, unter allen Völkern seine Wunder!"],[4,"Denn der HERR ist groß und sehr zu loben; er ist zu fürchten über alle Götter."],[5,"Denn alle Götter der Völker sind Götzen; aber der HERR hat den Himmel gemacht."],[6,"Pracht und Hoheit sind vor ihm, Stärke und Herrlichkeit in seinem Heiligtum."],[7,"Gebet dem HERRN, ihr Völkerstämme, gebet dem HERRN Ehre und Stärke!"],[8,"Gebet dem HERRN die Ehre seines Namens, bringet Geschenke und kommt in seine Vorhöfe!"],[9,"Betet an den HERRN in heiligem Schmuck! Es fürchte ihn alle Welt!"],[10,"Saget unter den Heiden: »Der HERR ist König.« Auch hat er den Erdkreis gegründet, dass er nicht wankt; er richtet die Völker gerecht."],[11,"Der Himmel freue sich, und die Erde sei fröhlich; es brause das Meer und was darinnen ist;"],[12,"es freue sich das Feld und was darauf ist, und lass alle Bäume im Walde fröhlich sein"],[13,"vor dem HERRN; denn er kommt, denn er kommt, die Erde zu richten. Er wird den Erdkreis richten mit Gerechtigkeit und die Völker mit seiner Wahrheit."]]};
+
+PSALMEN[97]={sup:"",v:[[1,"Der HERR ist König; das freue sich das Erdreich und seien fröhlich die vielen Inseln!"],[2,"Wolken und Dunkel sind um ihn her; Gerechtigkeit und Recht sind seines Thrones Stütze."],[3,"Feuer geht vor ihm her und verbrennt rings seine Widersacher."],[4,"Seine Blitze erleuchten den Erdkreis; das Erdreich sieht's und erschrickt."],[5,"Die Berge zerschmelzen wie Wachs vor dem HERRN, vor dem Herrn aller Lande."],[6,"Die Himmel verkündigen seine Gerechtigkeit, und alle Völker sehen seine Herrlichkeit."],[7,"Alle die zuschanden werden, die den Götzen dienen und sich der Abgötterei rühmen. Betet ihn an, alle Götter!"],[8,"Zion hört's und freut sich, und die Töchter Judas frohlocken über deine Gerichte, HERR."],[9,"Denn du, HERR, bist der Höchste über dem ganzen Erdkreis; du bist hoch erhaben über alle Götter."],[10,"Ihr, die ihr den HERRN liebt: hasset das Böse! Er bewahrt die Seelen seiner Heiligen; aus der Hand der Gottlosen errettet er sie."],[11,"Dem Gerechten geht ein Licht auf in der Finsternis, dem Frommen Freude."],[12,"Freuet euch des HERRN, ihr Gerechten, und danket ihm für sein heiliges Walten!"]]};
+
+PSALMEN[98]={sup:"Ein Psalm.",v:[[1,"Singet dem HERRN ein neues Lied, denn er tut Wunder. Er schafft Heil mit seiner Rechten und mit seinem heiligen Arm."],[2,"Der HERR lässt sein Heil kundwerden; vor den Völkern macht er seine Gerechtigkeit offenbar."],[3,"Er denkt an seine Gnade und Treue für das Haus Israel. Alle Enden der Erde sehen das Heil unsres Gottes."],[4,"Jauchzet dem HERRN, alle Welt, singet, rühmet und lobsinget!"],[5,"Lobsinget dem HERRN mit der Harfe, mit der Harfe und Psalmenklang!"],[6,"Mit Trompeten und Posaunenschall jauchzet vor dem HERRN, dem König!"],[7,"Das Meer brause und was darinnen ist, der Erdkreis und seine Bewohner."],[8,"Die Ströme sollen in die Hände klatschen, und alle Berge sollen jauchzen"],[9,"vor dem HERRN; denn er kommt, die Erde zu richten. Er wird den Erdkreis richten mit Gerechtigkeit und die Völker mit Recht."]]};
+
+PSALMEN[100]={sup:"Ein Danklied.",v:[[1,"Jauchzet dem HERRN, alle Welt!"],[2,"Dienet dem HERRN mit Freuden, kommt vor sein Angesicht mit Frohlocken!"],[3,"Erkennet, dass der HERR Gott ist! Er hat uns gemacht – und nicht wir selbst – zu seinem Volk und zu Schafen seiner Weide."],[4,"Gehet zu seinen Toren ein mit Danken, zu seinen Vorhöfen mit Loben; danket ihm, lobet seinen Namen!"],[5,"Denn der HERR ist freundlich, und seine Gnade währet ewig, und seine Wahrheit für und für."]]};
+
+PSALMEN[102]={sup:"Gebet eines Elenden, wenn er in Angst ist und seinen Kummer vor dem HERRN ausschüttet.",v:[[1,"HERR, höre mein Gebet und lass mein Schreien zu dir kommen!"],[2,"Verbirg dein Angesicht nicht vor mir in meiner Not; neige dein Ohr zu mir; wenn ich dich anrufe, erhöre mich bald!"],[3,"Denn meine Tage vergehen wie Rauch, und meine Gebeine brennen wie Feuer."],[4,"Mein Herz ist geschlagen und verdorrt wie Gras, sodass ich vergesse, mein Brot zu essen."],[5,"Um meines lauten Seufzens willen klebt mein Fleisch an meinen Knochen."],[6,"Ich bin wie ein Pelikan in der Wüste, ich bin wie ein Käuzchen in der Öde geworden."],[7,"Ich liege wach und bin wie ein Sperling, der allein auf dem Dache sitzt."],[12,"Du aber, HERR, bleibest ewiglich, und dein Name für und für."],[13,"Du wirst dich aufmachen und dich über Zion erbarmen."],[25,"Vor Zeiten hast du die Erde gegründet, und die Himmel sind deiner Hände Werk."],[26,"Sie werden vergehen, aber du bleibst; sie alle werden veralten wie ein Gewand; du wechselst sie wie ein Kleid, und sie vergehen."],[27,"Aber du bleibst, wie du bist, und deine Jahre nehmen kein Ende."],[28,"Die Kinder deiner Knechte werden sicher wohnen, und ihr Geschlecht soll vor dir bestehen."]]};
+
+PSALMEN[103]={sup:"Von David.",v:[[1,"Lobe den HERRN, meine Seele, und was in mir ist, seinen heiligen Namen!"],[2,"Lobe den HERRN, meine Seele, und vergiss nicht, was er dir Gutes getan hat:"],[3,"der dir alle deine Sünden vergibt und alle deine Gebrechen heilt,"],[4,"der dein Leben vom Verderben erlöst, der dich krönet mit Gnade und Barmherzigkeit,"],[5,"der deinen Mund fröhlich macht und du wieder jung wirst wie ein Adler."],[6,"Der HERR schafft Gerechtigkeit und Recht allen, die Unrecht leiden."],[7,"Er hat Mose seine Wege wissen lassen, die Kinder Israel seine Taten."],[8,"Barmherzig und gnädig ist der HERR, geduldig und von großer Güte."],[9,"Er wird nicht immer hadern, noch ewig Zorn halten."],[10,"Er handelt nicht mit uns nach unsern Sünden und vergilt uns nicht nach unsrer Missetat."],[11,"Denn so hoch der Himmel über der Erde ist, so groß ist seine Gnade über denen, die ihn fürchten."],[12,"So fern der Morgen ist vom Abend, so fern lässt er unsre Übertretungen von uns."],[13,"Wie sich ein Vater über Kinder erbarmt, so erbarmt sich der HERR über die, die ihn fürchten."],[14,"Denn er kennt unser Gebilde, er denkt daran, dass wir Staub sind."],[15,"Ein Mensch ist in seinem Leben wie Gras, er blüht wie eine Blume auf dem Felde;"],[16,"wenn der Wind darüber geht, so ist sie nimmer da, und ihre Stätte kennet sie nicht mehr."],[17,"Aber die Gnade des HERRN währt von Ewigkeit zu Ewigkeit bei denen, die ihn fürchten."],[18,"die seinen Bund halten und an seine Gebote denken, dass sie danach tun."],[19,"Der HERR hat seinen Thron im Himmel errichtet, und sein Reich herrscht über alles."],[20,"Lobet den HERRN, ihr seine Engel, ihr starken Helden, die ihr seinen Befehl ausrichtet und seiner Stimme Gehorsam leistet!"],[21,"Lobet den HERRN, alle seine Heerscharen, seine Diener, die ihr seinen Willen tut!"],[22,"Lobet den HERRN, alle seine Werke an allen Orten seiner Herrschaft! Lobe den HERRN, meine Seele!"]]};
+
+PSALMEN[104]={sup:"",v:[[1,"Lobe den HERRN, meine Seele! HERR, mein Gott, du bist sehr herrlich; du bist schön und prächtig geschmückt."],[2,"Licht ist dein Kleid, das du anhast; du breitest den Himmel aus wie einen Teppich,"],[3,"du der du dein Gemach im Wasser baust, der du die Wolken zu deinem Wagen machst und auf den Flügeln des Windes fährst,"],[4,"der du die Winde zu deinen Boten machst, zu deinen Dienern das flammende Feuer."],[5,"Du hast die Erde auf ihre Stützen gegründet, dass sie nimmermehr wankt."],[6,"Die Tiefe liegt drüber wie ein Gewand; die Wasser stehen über den Bergen."],[10,"Du lässt Quellen hervorbrechen in den Tälern, die zwischen den Bergen fließen,"],[11,"dass sie tränken alle Tiere auf dem Felde, und die Wildesel ihren Durst stillen."],[12,"Die Vögel des Himmels wohnen daneben und singen zwischen den Ästen."],[14,"Du lässt Gras wachsen für das Vieh und Gewächs zum Dienst der Menschen, dass du Brot aus der Erde bringst"],[15,"und Wein, der des Menschen Herz erfreut, und Öl, das das Angesicht schön macht, und Brot, das des Menschen Herz stärkt."],[24,"HERR, wie sind deine Werke so groß und viel! Du hast sie alle weise geordnet, und die Erde ist voll deiner Güter."],[27,"Sie alle warten auf dich, dass du ihnen Speise gebest zur rechten Zeit."],[28,"Wenn du ihnen gibst, so sammeln sie; wenn du deine Hand auftust, so werden sie satt mit Gutem."],[30,"Wenn du deinen Odem aussendest, so werden sie geschaffen, und du erneuerst das Antlitz der Erde."],[31,"Die Herrlichkeit des HERRN bleibe ewiglich; der HERR freue sich seiner Werke."],[33,"Ich will dem HERRN singen mein Leben lang; ich will meinem Gott lobsingen, solange ich bin."],[34,"Mein Sinnen soll ihm wohlgefallen; ich freue mich des HERRN."]]};
+
+PSALMEN[110]={sup:"Ein Psalm Davids.",v:[[1,"Der HERR sprach zu meinem Herrn: Setze dich zu meiner Rechten, bis ich deine Feinde zum Schemel deiner Füße mache."],[2,"Der HERR wird das Zepter deiner Macht senden aus Zion: Herrsche inmitten deiner Feinde!"],[3,"Dein Volk ist willig, wenn du rüstest; deine Jünger kommen zu dir in heiligem Schmuck. Aus dem Mutterschoß der Morgenröte kommt der Tau, den ich dir gezeugt habe."],[4,"Der HERR hat geschworen und wird's nicht bereuen: Du bist Priester ewiglich nach der Ordnung Melchisedeks."],[5,"Der Herr ist dir zur Rechten; er hat Könige zerschmettert am Tage seines Zornes."],[6,"Er richtet unter den Heiden; Leichen füllen das Feld; er zerschmettert das Haupt über großem Gebiet."],[7,"Er trinkt vom Bach auf dem Weg; darum hebt er das Haupt hoch."]]};
+
+PSALMEN[113]={sup:"",v:[[1,"Halleluja! Lobet, ihr Knechte des HERRN, lobet den Namen des HERRN!"],[2,"Der Name des HERRN sei gelobet von nun an bis in Ewigkeit."],[3,"Vom Aufgang der Sonne bis zu ihrem Niedergang sei der Name des HERRN gelobet."],[4,"Der HERR ist erhaben über alle Völker, seine Herrlichkeit über die Himmel."],[5,"Wer ist wie der HERR, unser Gott, der so hoch thront"],[6,"und herabschaut auf Himmel und Erde?"],[7,"Er erhebt den Schwachen aus dem Staub und erhöht den Armen aus dem Schmutz,"],[8,"um ihn zu setzen bei den Fürsten, bei den Fürsten seines Volkes."],[9,"Er macht die Unfruchtbare zur Mutter, die fröhlich ist in Kindern. Halleluja!"]]};
+
+PSALMEN[114]={sup:"",v:[[1,"Als Israel aus Ägypten zog, das Haus Jakobs aus dem fremden Volk,"],[2,"da ward Juda sein Heiligtum, Israel sein Reich."],[3,"Das Meer sah es und floh; der Jordan wich zurück."],[4,"Die Berge hüpften wie Widder, die Hügel wie Lämmer."],[5,"Was war dir, Meer, dass du flohst, und dir, Jordan, dass du zurückwichest?"],[6,"Ihr Berge, dass ihr hüpftet wie Widder, ihr Hügel wie Lämmer?"],[7,"Vor dem Angesicht des Herrn bebe, du Erde, vor dem Angesicht des Gottes Jakobs,"],[8,"der den Fels in einen Wasserteich verwandelt, den Kieselstein in eine Wasserquelle."]]};
+
+PSALMEN[116]={sup:"",v:[[1,"Das ist mir lieb, dass der HERR meine Stimme und mein Flehen hört."],[2,"Denn er hat sein Ohr zu mir geneigt; darum will ich mein Leben lang ihn anrufen."],[3,"Die Stricke des Todes hatten mich umfangen, und die Angst der Hölle hatte mich getroffen; ich kam in Jammer und Not."],[4,"Aber ich rief an den Namen des HERRN: Ach, HERR, errette meine Seele!"],[5,"Der HERR ist gnädig und gerecht, und unser Gott ist barmherzig."],[6,"Der HERR behütet die Einfältigen; ich war in Not, und er half mir."],[7,"Sei nun wieder stille, meine Seele; denn der HERR tut dir Gutes."],[8,"Denn du hast meine Seele vom Tode gerissen, mein Auge von den Tränen, meinen Fuß vom Gleiten."],[9,"Ich werde wandeln vor dem HERRN im Lande der Lebendigen."],[12,"Was soll ich dem HERRN vergelten für all seine Wohltat an mir?"],[13,"Ich will den Kelch des Heils nehmen und des HERRN Namen anrufen."],[14,"Ich will meine Gelübde dem HERRN bezahlen vor seinem ganzen Volk."],[15,"Das kostet viel in den Augen des HERRN, wenn seine Heiligen sterben."],[17,"Ich will dir ein Dankopfer opfern und des HERRN Namen anrufen."],[18,"Ich will meine Gelübde dem HERRN bezahlen vor seinem ganzen Volk,"],[19,"in den Vorhöfen des Hauses des HERRN, mitten in dir, Jerusalem. Halleluja!"]]};
+
+PSALMEN[117]={sup:"",v:[[1,"Lobet den HERRN, alle Heiden! Preiset ihn, alle Völker!"],[2,"Denn seine Gnade und Wahrheit waltet über uns in Ewigkeit. Halleluja!"]]};
+
+PSALMEN[118]={sup:"",v:[[1,"Danket dem HERRN, denn er ist freundlich, denn seine Güte währet ewiglich."],[2,"Israel sage: Seine Güte währet ewiglich."],[3,"Das Haus Aaron sage: Seine Güte währet ewiglich."],[4,"Die den HERRN fürchten, sagen: Seine Güte währet ewiglich."],[5,"Ich rief zum HERRN in meiner Angst, und er antwortete mir und half mir."],[6,"Der HERR ist bei mir, ich fürchte mich nicht; was kann mir ein Mensch tun?"],[7,"Der HERR ist bei mir, mein Helfer, darum werde ich meine Feinde überwältigen."],[8,"Es ist gut, auf den HERRN vertrauen, und nicht sich verlassen auf Menschen."],[9,"Es ist gut, auf den HERRN vertrauen und nicht sich verlassen auf Fürsten."],[14,"Der HERR ist meine Macht und mein Psalm, und er ist mein Heil."],[15,"Man singt mit Freuden vom Sieg in den Hütten der Gerechten: Die Rechte des HERRN behält den Sieg!"],[17,"Ich werde nicht sterben, sondern leben und des HERRN Werke verkündigen."],[19,"Tut mir auf die Tore der Gerechtigkeit, dass ich hineingehe und dem HERRN danke."],[21,"Ich danke dir, dass du mich erhört hast und mein Heil geworden bist."],[22,"Der Stein, den die Bauleute verworfen haben, ist zum Eckstein geworden."],[23,"Das ist vom HERRN geschehen und ist ein Wunder vor unsern Augen."],[24,"Dies ist der Tag, den der HERR macht; lasset uns freuen und fröhlich an ihm sein."],[25,"O HERR, hilf! O HERR, lass es wohl gelingen!"],[26,"Gelobet sei, der da kommt im Namen des HERRN! Wir segnen euch vom Hause des HERRN."],[27,"Der HERR ist Gott und erleuchtet uns. Schaffet das Fest und bindet die Festopfer mit Seilen bis an die Hörner des Altars!"],[28,"Du bist mein Gott, und ich danke dir; mein Gott, ich lobe dich."],[29,"Danket dem HERRN, denn er ist freundlich, denn seine Güte währet ewiglich."]]};
+
+PSALMEN[121]={sup:"Ein Wallfahrtslied.",v:[[1,"Ich hebe meine Augen auf zu den Bergen. Woher kommt mir Hilfe?"],[2,"Meine Hilfe kommt vom HERRN, der Himmel und Erde gemacht hat."],[3,"Er wird deinen Fuß nicht gleiten lassen, und der dich behütet, schläft nicht."],[4,"Siehe, der Hüter Israels schläft und schlummert nicht."],[5,"Der HERR behütet dich; der HERR ist dein Schatten über deiner rechten Hand,"],[6,"dass dich des Tages die Sonne nicht steche noch der Mond des Nachts."],[7,"Der HERR behüte dich vor allem Übel, er behüte deine Seele."],[8,"Der HERR behüte deinen Ausgang und Eingang von nun an bis in Ewigkeit."]]};
+
+PSALMEN[122]={sup:"Ein Wallfahrtslied Davids.",v:[[1,"Ich freute mich, als man mir sagte: Wir wollen zum Hause des HERRN gehen."],[2,"Nun stehen unsre Füße in deinen Toren, Jerusalem."],[3,"Jerusalem ist gebaut als eine Stadt, die fest zusammengefügt ist,"],[4,"wohin die Stämme hinaufziehen, die Stämme des HERRN, wie es geboten ist Israel, den Namen des HERRN zu loben."],[5,"Denn dort stehen die Throne des Gerichts, die Throne des Hauses David."],[6,"Wünschet Jerusalem Frieden! Es möge wohl gehen denen, die dich lieben."],[7,"Friede sei in deinen Mauern und Glück in deinen Palästen!"],[8,"Um meiner Brüder und Freunde willen will ich dir Frieden zurufen."],[9,"Um des Hauses des HERRN, unsres Gottes, willen will ich dein Bestes suchen."]]};
+
+PSALMEN[126]={sup:"Ein Wallfahrtslied.",v:[[1,"Als der HERR das Geschick Zions wendete, da waren wir wie die Träumenden."],[2,"Da ward unser Mund voll Lachens und unsre Zunge voll Rühmens. Da sprach man unter den Völkern: Der HERR hat Großes an ihnen getan!"],[3,"Der HERR hat Großes an uns getan; des sind wir fröhlich."],[4,"HERR, wende unser Geschick wie du die Bäche wiederbringst im Südland."],[5,"Die mit Tränen säen, werden mit Freuden ernten."],[6,"Sie gehen hin und weinen und tragen edlen Samen und kommen mit Freuden und bringen ihre Garben."]]};
+
+PSALMEN[130]={sup:"Ein Wallfahrtslied.",v:[[1,"Aus der Tiefe rufe ich, HERR, zu dir."],[2,"Herr, höre meine Stimme! Lass deine Ohren merken auf die Stimme meines Flehens!"],[3,"Wenn du, HERR, Sünden anrechnen willst – Herr, wer wird bestehen?"],[4,"Aber bei dir ist Vergebung, dass man dich fürchte."],[5,"Ich harre auf den HERRN, meine Seele harret, und ich hoffe auf sein Wort."],[6,"Meine Seele wartet auf den Herrn mehr als die Wächter auf den Morgen, die Wächter auf den Morgen."],[7,"Israel, hoffe auf den HERRN! Denn bei dem HERRN ist die Güte und viel Erlösung bei ihm."],[8,"Und er wird Israel erlösen aus allen seinen Sünden."]]};
+
+PSALMEN[131]={sup:"Ein Wallfahrtslied Davids.",v:[[1,"HERR, mein Herz ist nicht hoffärtig, und meine Augen sind nicht hochmütig; ich wandle nicht in großen Dingen, die mir zu wunderbar sind."],[2,"Wahrlich, ich habe meine Seele still und ruhig gemacht, wie ein entwöhntes Kind bei seiner Mutter; wie ein entwöhntes Kind, so ist meine Seele bei mir."],[3,"Israel, harre auf den HERRN, von nun an bis in Ewigkeit!"]]};
+
+PSALMEN[136]={sup:"",v:[[1,"Danket dem HERRN, denn er ist freundlich, denn seine Güte währet ewiglich."],[2,"Danket dem Gott aller Götter, denn seine Güte währet ewiglich."],[3,"Danket dem Herrn aller Herren, denn seine Güte währet ewiglich."],[4,"Der allein große Wunder tut, denn seine Güte währet ewiglich."],[5,"Der die Himmel mit Verstand gemacht hat, denn seine Güte währet ewiglich."],[6,"Der die Erde über dem Wasser ausgebreitet hat, denn seine Güte währet ewiglich."],[7,"Der die großen Lichter gemacht hat, denn seine Güte währet ewiglich."],[8,"die Sonne, dass sie des Tages herrsche, denn seine Güte währet ewiglich;"],[9,"den Mond und die Sterne, dass sie des Nachts herrschen, denn seine Güte währet ewiglich."],[23,"Der an uns gedacht hat in unsrer Niedrigkeit, denn seine Güte währet ewiglich."],[24,"und uns von unsern Feinden erlöst hat, denn seine Güte währet ewiglich."],[25,"Der allen Fleisch Speise gibt, denn seine Güte währet ewiglich."],[26,"Danket dem Gott des Himmels, denn seine Güte währet ewiglich."]]};
+
+PSALMEN[138]={sup:"Von David.",v:[[1,"Ich danke dir von ganzem Herzen; vor den Göttern will ich dir lobsingen."],[2,"Ich will mich niederwerfen vor deinem heiligen Tempel und deinem Namen danken um deiner Gnade und Treue willen; denn du hast dein Wort über alles herrlich gemacht."],[3,"Wenn ich dich anrufe, erhörst du mich; du machst mir in der Seele Kraft."],[4,"Es werden dir danken, HERR, alle Könige der Erde; denn sie hören die Worte deines Mundes."],[5,"Sie werden singen von den Wegen des HERRN, denn groß ist die Herrlichkeit des HERRN."],[6,"Der HERR ist hoch und schaut auf die Niedrigen; die Hoffärtigen kennt er von fern."],[7,"Ich wandle mitten in Angst; du erquickst mich und streckst deine Hand aus gegen den Zorn meiner Feinde und hilfst mir mit deiner Rechten."],[8,"Der HERR wird's vollenden an mir. Herr, deine Güte währet ewig; verlass nicht die Werke deiner Hände!"]]};
+
+PSALMEN[139]={sup:"Dem Chorleiter. Ein Psalm Davids.",v:[[1,"HERR, du erforschest mich und kennest mich."],[2,"Ich sitze oder stehe auf, so weißt du es; du verstehst meine Gedanken von ferne."],[3,"Ich gehe oder liege, so bist du um mich und siehst alle meine Wege."],[4,"Denn sieh, es ist kein Wort auf meiner Zunge, das du, HERR, nicht schon wüsstest."],[5,"Von allen Seiten umgibst du mich und hältst deine Hand über mir."],[6,"Diese Erkenntnis ist mir zu wunderbar und zu hoch; ich kann sie nicht begreifen."],[7,"Wo soll ich hingehen vor deinem Geist, und wo soll ich hinfliehen vor deinem Angesicht?"],[8,"Führe ich in den Himmel, so bist du da; bettete ich mich bei den Toten, so bist du auch da."],[9,"Nähme ich Flügel der Morgenröte und bliebe am äußersten Meer,"],[10,"so würde doch deine Hand mich führen und deine Rechte mich halten."],[11,"Spräche ich: Finsternis soll mich decken und Nacht statt Licht um mich sein –"],[12,"so ist auch Finsternis nicht finster bei dir, und die Nacht leuchtet wie der Tag; Finsternis und Licht ist einerlei."],[13,"Denn du hast meine Nieren bereitet und hast mich gebildet im Mutterleib."],[14,"Ich danke dir dafür, dass ich wunderbar gemacht bin; wunderbar sind deine Werke; das erkennt meine Seele."],[17,"Wie schwer sind für mich, Gott, deine Gedanken! Wie viele ihrer sind!"],[18,"Wollte ich sie zählen, so sind ihrer mehr als des Sandes; wenn ich aufwache, bin ich noch bei dir."],[23,"Erforsche mich, Gott, und erkenne mein Herz; prüfe mich und erkenne, wie ich's meine."],[24,"Und sieh, ob ich auf bösem Wege bin, und leite mich auf ewigem Wege."]]};
+
+PSALMEN[143]={sup:"Ein Psalm Davids.",v:[[1,"HERR, höre mein Gebet, vernimm mein Flehen um deiner Treue willen; erhöre mich um deiner Gerechtigkeit willen!"],[2,"Und geh nicht ins Gericht mit deinem Knecht; denn vor dir ist kein Lebendiger gerecht."],[3,"Der Feind verfolgt meine Seele und schlägt mein Leben zu Boden; er stößt mich in die Finsternis wie die Toten von alters."],[4,"Mein Geist ist in mir verschmachtet, mein Herz in mir erschrocken."],[5,"Ich denke an die alten Zeiten; ich sinne nach über all deine Werke und rede von deinen Taten."],[6,"Ich breite meine Hände aus zu dir; meine Seele dürstet nach dir wie dürres Land."],[7,"HERR, erhöre mich bald, mein Geist vergeht. Verbirg dein Angesicht nicht vor mir, ich wäre denen gleich, die in die Grube fahren."],[8,"Lass mich in der Frühe deine Gnade hören; denn ich hoffe auf dich. Lass mich wissen den Weg, den ich gehen soll; denn zu dir erhebe ich meine Seele."],[10,"Lehre mich tun nach deinem Wohlgefallen, denn du bist mein Gott; dein guter Geist führe mich auf ebener Bahn."],[11,"HERR, erquicke mich um deines Namens willen; führe meine Seele aus der Not durch deine Gerechtigkeit!"]]};
+
+PSALMEN[145]={sup:"Lobgesang Davids.",v:[[1,"Ich will dich erheben, mein Gott, du König, und deinen Namen loben immer und ewiglich."],[2,"Ich will dich täglich loben und deinen Namen rühmen immer und ewiglich."],[3,"Der HERR ist groß und sehr zu loben, und seine Größe ist nicht zu erforschen."],[4,"Ein Geschlecht preist dem anderen deine Werke und verkündigt deine Macht."],[5,"Ich will über die herrliche Schönheit deiner Würde nachsinnen und deine Wunder erzählen."],[6,"Man wird reden von der Kraft deiner erschrecklichen Taten, und ich will deine Größe erzählen."],[7,"Das Gedächtnis deiner großen Güte werden sie ausbreiten, und man wird deine Gerechtigkeit rühmen."],[8,"Der HERR ist gnädig und barmherzig, geduldig und von großer Güte."],[9,"Der HERR ist gut an allen Orten und erbarmt sich aller seiner Werke."],[10,"Es sollen dir danken, HERR, alle deine Werke, und deine Heiligen sollen dich loben."],[11,"Sie sollen reden von der Herrlichkeit deines Reiches und von deiner Macht erzählen,"],[12,"damit die Menschenkinder seine großen Taten erfahren und die herrliche Pracht seines Reiches."],[13,"Dein Reich ist ein ewiges Reich, und deine Herrschaft währet für und für."],[14,"Der HERR erhält alle, die fallen, und richtet auf alle, die niedergebeugt sind."],[15,"Aller Augen warten auf dich, und du gibst ihnen ihre Speise zur rechten Zeit."],[16,"Du tust deine Hand auf und sättigst alles, was lebt, nach deinem Wohlgefallen."],[17,"Der HERR ist gerecht in allen seinen Wegen und gütig in allen seinen Werken."],[18,"Der HERR ist nahe allen, die ihn anrufen, allen, die ihn mit Ernst anrufen."],[19,"Er tut, was die Gottesfürchtigen begehren, und hört ihr Schreien und hilft ihnen."],[20,"Der HERR behütet alle, die ihn lieben, und vertilgt alle Gottlosen."],[21,"Mein Mund soll des HERRN Lob verkündigen, und alles Fleisch soll seinen heiligen Namen loben immer und ewiglich."]]};
+
+PSALMEN[146]={sup:"",v:[[1,"Halleluja! Lobe den HERRN, meine Seele!"],[2,"Ich will den HERRN loben mein Leben lang und meinem Gott lobsingen, solange ich bin."],[3,"Vertrauet nicht auf Fürsten; sie sind Menschen und können nicht helfen."],[4,"Wenn ihr Geist ausgeht, werden sie wieder zur Erde; an demselben Tage ist es aus mit ihrem Anschlägen."],[5,"Wohl dem, dessen Helfer der Gott Jakobs ist, wessen Hoffnung auf dem HERRN, seinem Gott, steht,"],[6,"der Himmel und Erde gemacht hat, das Meer und alles, was darinnen ist, der Treue hält ewiglich,"],[7,"der dem Unterdrückten Recht schafft, der den Hungrigen Brot gibt. Der HERR befreit die Gefangenen."],[8,"Der HERR macht den Blinden sehend. Der HERR richtet auf, die niedergebeugt sind. Der HERR liebt die Gerechten."],[9,"Der HERR behütet die Fremdlinge und erhält Waisen und Witwen; aber den Weg der Gottlosen macht er krumm."],[10,"Der HERR ist König ewiglich, dein Gott, Zion, für und für. Halleluja!"]]};
+
+PSALMEN[148]={sup:"",v:[[1,"Halleluja! Lobet den HERRN vom Himmel, lobet ihn in der Höhe!"],[2,"Lobet ihn, alle seine Engel, lobet ihn, all sein Heer!"],[3,"Lobet ihn, Sonne und Mond, lobet ihn, alle leuchtenden Sterne!"],[4,"Lobet ihn, ihr Himmel aller Himmel und das Wasser über den Himmeln!"],[5,"Die sollen loben den Namen des HERRN; denn er gebot, und sie wurden geschaffen."],[6,"Er hat sie befestigt auf ewig und ewig; er hat ein Gesetz gesetzt, das gilt ewig."],[7,"Lobet den HERRN, ihr auf Erden, ihr Meeresdrachen und alle Tiefen,"],[8,"Feuer, Hagel, Schnee, Dampf, Sturmwind, die seinen Befehl ausführen,"],[9,"Berge und alle Hügel, Fruchtbäume und alle Zedern,"],[10,"Getier und alles Vieh, Gewürm und gefiedertes Gevögel,"],[11,"Könige der Erde und alle Völker, Fürsten und alle Richter der Erde,"],[12,"Jünglinge und auch Jungfrauen, Alte mit den Jungen:"],[13,"die loben den Namen des HERRN; denn sein Name allein ist hoch, seine Herrlichkeit über Erde und Himmel."],[14,"Er erhöht das Horn seines Volkes. Das ist der Ruhm aller seiner Heiligen, der Kinder Israel, des Volkes, das ihm nahe ist. Halleluja!"]]};
+
+PSALMEN[150]={sup:"",v:[[1,"Halleluja! Lobet Gott in seinem Heiligtum; lobet ihn in der Feste seiner Macht!"],[2,"Lobet ihn für seine Machttaten; lobet ihn nach seiner großen Herrlichkeit!"],[3,"Lobet ihn mit Posaunen; lobet ihn mit Psalter und Harfe!"],[4,"Lobet ihn mit Pauken und Reigen; lobet ihn mit Saiten und Pfeifen!"],[5,"Lobet ihn mit wohlklingenden Zimbeln; lobet ihn mit schallenden Zimbeln!"],[6,"Alles, was Odem hat, lobe den HERRN! Halleluja!"]]};
+
+/* ═══════════════════════════════════════════
+   KIRCHENJAHR-LOGIK
+   ═══════════════════════════════════════════ */
+const addDays = (d,n)=>{ const r=new Date(d); r.setDate(r.getDate()+n); return r; };
+const strip   = d => new Date(d.getFullYear(),d.getMonth(),d.getDate());
+const sameDay = (a,b) => a.getFullYear()===b.getFullYear()&&a.getMonth()===b.getMonth()&&a.getDate()===b.getDate();
+const WOCHENTAGE = ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'];
+const MONATE = ['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
+
+function osterDatum(y) {
+  const a=y%19,b=Math.floor(y/100),c=y%100,d=Math.floor(b/4),e=b%4,
+        f=Math.floor((b+8)/25),g=Math.floor((b-f+1)/3),
+        h=(19*a+b-d-g+15)%30,i=Math.floor(c/4),k=c%4,
+        l=(32+2*e+2*i-h-k)%7,m=Math.floor((a+11*h+22*l)/451),
+        mo=Math.floor((h+l-7*m+114)/31), dy=((h+l-7*m+114)%31)+1;
+  return new Date(y, mo-1, dy);
+}
+
+function erstAdvent(y) {
+  for(let i=0;i<7;i++){ const d=new Date(y,10,27+i); if(d.getDay()===0) return d; }
+}
+
+function kirchenDaten(y) {
+  const o=osterDatum(y);
+  return {
+    epiphanie: new Date(y,0,6),
+    aschermittwoch: addDays(o,-46),
+    palmsonntag: addDays(o,-7),
+    gruendonnerstag: addDays(o,-3),
+    karfreitag: addDays(o,-2),
+    karsamstag: addDays(o,-1),
+    ostern: o,
+    ostermontag: addDays(o,1),
+    weißerSonntag: addDays(o,7),
+    himmelfahrt: addDays(o,39),
+    pfingsten: addDays(o,49),
+    pfingstmontag: addDays(o,50),
+    trinitatis: addDays(o,56),
+    weihnachten: new Date(y,11,25),
+    advent: erstAdvent(y)
+  };
+}
+
+/* ═══════════════════════════════════════════
+   SAISON BESTIMMEN
+   ═══════════════════════════════════════════ */
+const SAISON_META = {
+  advent:      { name:'Advent',          cls:'s-advent'      },
+  weihnachten: { name:'Weihnachtszeit',  cls:'s-weihnachten' },
+  epiphanie:   { name:'Epiphanie',       cls:'s-epiphanie'   },
+  fasten:      { name:'Passionszeit',    cls:'s-fasten'      },
+  karwoche:    { name:'Karwoche',        cls:'s-karwoche'    },
+  ostern:      { name:'Osterzeit',       cls:'s-ostern'      },
+  himmelfahrt: { name:'Himmelfahrtszeit',cls:'s-himmelfahrt' },
+  pfingsten:   { name:'Pfingstzeit',     cls:'s-pfingsten'   },
+  trinitatis:  { name:'Trinitatis',      cls:'s-trinitatis'  },
+};
+
+function getSaison(date) {
+  const d=strip(date), y=d.getFullYear();
+  const c=kirchenDaten(y), p=kirchenDaten(y-1);
+  if(d>=c.advent)         return { key:'advent',      start:c.advent,       ...SAISON_META.advent };
+  if(d>=c.trinitatis)     return { key:'trinitatis',  start:c.trinitatis,   ...SAISON_META.trinitatis };
+  if(d>=c.pfingsten)      return { key:'pfingsten',   start:c.pfingsten,    ...SAISON_META.pfingsten };
+  if(d>=c.himmelfahrt)    return { key:'himmelfahrt', start:c.himmelfahrt,  ...SAISON_META.himmelfahrt };
+  if(d>=c.ostern)         return { key:'ostern',      start:c.ostern,       ...SAISON_META.ostern };
+  if(d>=c.palmsonntag)    return { key:'karwoche',    start:c.palmsonntag,  ...SAISON_META.karwoche };
+  if(d>=c.aschermittwoch) return { key:'fasten',      start:c.aschermittwoch,...SAISON_META.fasten };
+  if(d>=c.epiphanie)      return { key:'epiphanie',   start:c.epiphanie,    ...SAISON_META.epiphanie };
+  if(d>=p.weihnachten||d>=c.weihnachten) return { key:'weihnachten', start:d>=c.weihnachten?c.weihnachten:p.weihnachten, ...SAISON_META.weihnachten };
+  return { key:'trinitatis', start:p.trinitatis, ...SAISON_META.trinitatis };
+}
+
+/* ═══════════════════════════════════════════
+   BESONDERE TAGE
+   ═══════════════════════════════════════════ */
+function getBesondererTag(date) {
+  const y=date.getFullYear(), m=date.getMonth(), d=date.getDate();
+  const c=kirchenDaten(y);
+  const beweglich = [
+    [c.advent,'1. Advent'],[addDays(c.advent,7),'2. Advent'],[addDays(c.advent,14),'3. Advent'],[addDays(c.advent,21),'4. Advent'],
+    [c.aschermittwoch,'Aschermittwoch'],[c.palmsonntag,'Palmsonntag'],
+    [c.gruendonnerstag,'Gründonnerstag'],[c.karfreitag,'Karfreitag'],[c.karsamstag,'Karsamstag'],
+    [c.ostern,'Ostersonntag'],[c.ostermontag,'Ostermontag'],
+    [c.himmelfahrt,'Christi Himmelfahrt'],[c.pfingsten,'Pfingstsonntag'],
+    [c.pfingstmontag,'Pfingstmontag'],[c.trinitatis,'Trinitatis'],
+  ];
+  for(const [dt,label] of beweglich) if(sameDay(date,dt)) return label;
+  const fix={'0-1':'Neujahr','0-6':'Epiphanias','10-31':'Reformationstag',
+             '11-24':'Heiliger Abend','11-25':'1. Weihnachtstag','11-26':'2. Weihnachtstag','11-31':'Silvester'};
+  return fix[`${m}-${d}`]||null;
+}
+
+/* ═══════════════════════════════════════════
+   EKD-PERIKOPENORDNUNG: WOCHENPSALMEN
+   Jede Woche (Mo–So) hat einen Wochenpsalm
+   Basis: Sonntag der Woche → Psalm
+   ═══════════════════════════════════════════ */
+
+/* Sonntagsnummer im Kirchenjahr bestimmen */
+function getSonntagDerWoche(date) {
+  // Woche beginnt Montag; finde den Sonntag dieser Woche
+  const d = strip(date);
+  const wt = d.getDay(); // 0=So,1=Mo,...
+  if(wt === 0) return d;
+  return addDays(d, 7 - wt); // nächsten Sonntag (ISO week end)
+  // Besser: vorherigen Sonntag
+}
+
+function getLetztenSonntag(date) {
+  const d = strip(date);
+  const wt = d.getDay();
+  if(wt===0) return d;
+  return addDays(d, -wt);
+}
+
+/* Wochenpsalm nach EKD-Perikopenordnung (2018)
+   Zuordnung: Sonntag → Psalm-Nr */
+const WOCHENPSALMEN = {
+  // ADVENT
+  'advent-1': 24,
+  'advent-2': 80,
+  'advent-3': 85,
+  'advent-4': 25,
+  // WEIHNACHTEN
+  'weihnachten-1': 96,
+  'weihnachten-2': 97,
+  'weihnachten-3': 98,   // Neujahr/Sylvester
+  'weihnachten-4': 8,    // 1. Sonntag nach Weihnachten
+  'weihnachten-5': 67,   // Epiphanias
+  // EPIPHANIE
+  'epiphanie-1': 29,
+  'epiphanie-2': 66,
+  'epiphanie-3': 100,
+  'epiphanie-4': 138,
+  'epiphanie-5': 36,
+  'epiphanie-6': 92,
+  // PASSION/FASTEN
+  'fasten-1': 32,
+  'fasten-2': 31,
+  'fasten-3': 43,
+  'fasten-4': 34,
+  'fasten-5': 116,
+  'fasten-6': 118,   // Palmsonntag
+  // KARWOCHE
+  'karwoche-do': 116,
+  'karwoche-fr': 22,
+  'karwoche-sa': 88,
+  // OSTERN
+  'ostern-1': 118,
+  'ostern-2': 16,
+  'ostern-3': 23,
+  'ostern-4': 100,
+  'ostern-5': 66,
+  'ostern-6': 98,
+  'ostern-7': 47,    // Himmelfahrt-Sonntag / Exaudi
+  // PFINGSTEN
+  'pfingsten-1': 104,
+  // TRINITATIS (Reihe I/II/III nach Jahrgang)
+  'trinitatis-1': 29,
+  'trinitatis-2': 8,
+  'trinitatis-3': 19,
+  'trinitatis-4': 34,
+  'trinitatis-5': 62,
+  'trinitatis-6': 51,
+  'trinitatis-7': 127,
+  'trinitatis-8': 1,
+  'trinitatis-9': 107,
+  'trinitatis-10': 90,
+  'trinitatis-11': 84,
+  'trinitatis-12': 146,
+  'trinitatis-13': 121,
+  'trinitatis-14': 30,
+  'trinitatis-15': 145,
+  'trinitatis-16': 103,
+  'trinitatis-17': 31,
+  'trinitatis-18': 24,
+  'trinitatis-19': 32,
+  'trinitatis-20': 19,
+  'trinitatis-21': 130,
+  'trinitatis-22': 27,
+  'trinitatis-23': 116,
+  'trinitatis-24': 98,
+  'trinitatis-25': 126,
+  'trinitatis-26': 96,
+  'trinitatis-27': 90,
+  'erntedank': 65,
+  'reform': 46,
+  'buss': 130,
+  'totensonntag': 90,
+};
+
+/* TAGESPSALMEN nach Saison (für Wochentage) */
+const TAGESPSALMEN = {
+  advent:      [122,25,80,85,130,24,72],
+  weihnachten: [96,97,98,2,110,113,117],
+  epiphanie:   [29,67,72,100,66,19,138],
+  fasten:      [51,22,32,31,130,143,69],
+  karwoche:    [22,31,88,116,22,88,118],
+  ostern:      [118,16,30,23,66,98,150],
+  himmelfahrt: [47,110,93,8,24,29,97],
+  pfingsten:   [104,139,51,33,29,100,67],
+  trinitatis:  [103,121,34,23,91,46,139],
+};
+
+/* Wochenpsalm-Schlüssel für ein Datum ermitteln */
+function getWochenpsalmNr(date) {
+  const y=date.getFullYear();
+  const c=kirchenDaten(y), p=kirchenDaten(y-1);
+  const d=strip(date);
+
+  // Besondere Einzeltage
+  if(sameDay(d, c.karfreitag))    return WOCHENPSALMEN['karwoche-fr']||22;
+  if(sameDay(d, c.gruendonnerstag)) return WOCHENPSALMEN['karwoche-do']||116;
+  if(sameDay(d, c.karsamstag))    return WOCHENPSALMEN['karwoche-sa']||88;
+
+  const so = getLetztenSonntag(date);
+  const saison = getSaison(d);
+
+  if(saison.key==='advent') {
+    const woche=Math.floor((so-c.advent)/604800000)+1;
+    return WOCHENPSALMEN[`advent-${Math.min(woche,4)}`]||25;
+  }
+  if(saison.key==='weihnachten') {
+    const woche=Math.floor((so-saison.start)/604800000)+1;
+    return WOCHENPSALMEN[`weihnachten-${Math.min(woche,5)}`]||96;
+  }
+  if(saison.key==='epiphanie') {
+    const woche=Math.floor((so-c.epiphanie)/604800000)+1;
+    return WOCHENPSALMEN[`epiphanie-${Math.min(woche,6)}`]||29;
+  }
+  if(saison.key==='fasten') {
+    const woche=Math.floor((so-c.aschermittwoch)/604800000)+1;
+    return WOCHENPSALMEN[`fasten-${Math.min(woche,6)}`]||51;
+  }
+  if(saison.key==='karwoche') {
+    return 22;
+  }
+  if(saison.key==='ostern') {
+    const woche=Math.floor((so-c.ostern)/604800000)+1;
+    return WOCHENPSALMEN[`ostern-${Math.min(woche,7)}`]||118;
+  }
+  if(saison.key==='himmelfahrt') {
+    return WOCHENPSALMEN['ostern-7']||47;
+  }
+  if(saison.key==='pfingsten') {
+    return WOCHENPSALMEN['pfingsten-1']||104;
+  }
+  // Trinitatis
+  const woche=Math.floor((so-c.trinitatis)/604800000)+1;
+  return WOCHENPSALMEN[`trinitatis-${Math.min(woche,27)}`]||103;
+}
+
+/* Tagespsalm */
+function getTagespsalmNr(date) {
+  const saison=getSaison(date);
+  const pool=TAGESPSALMEN[saison.key]||TAGESPSALMEN.trinitatis;
+  return pool[date.getDay()];
+}
+
+/* ═══════════════════════════════════════════
+   STATE
+   ═══════════════════════════════════════════ */
+let aktuellDatum = strip(new Date());
+let aktivIdx     = null;
+let tagsPsalmen  = [0, 0];
+
+/* ═══════════════════════════════════════════
+   RENDER FUNKTIONEN
+   ═══════════════════════════════════════════ */
+function renderDatum(datum) {
+  document.getElementById('date-weekday').textContent = WOCHENTAGE[datum.getDay()];
+  const ist = sameDay(datum, new Date());
+  document.getElementById('date-main').innerHTML =
+    `${datum.getDate()}. ${MONATE[datum.getMonth()]} ${datum.getFullYear()}`
+    + (ist ? '<span class="today-chip">Heute</span>' : '');
+  document.getElementById('btn-today').disabled = ist;
+}
+
+function renderSaison(saison) {
+  document.getElementById('season-ribbon').textContent = saison.name;
+  const app = document.getElementById('app');
+  Object.values(SAISON_META).forEach(m => app.classList.remove(m.cls));
+  app.classList.add(saison.cls);
+  // Update top bar color
+  document.querySelector('.psalm-container::before');
+}
+
+function renderBesonderer(datum) {
+  const el = document.getElementById('special-day');
+  const name = getBesondererTag(datum);
+  if(name){ el.textContent='✦ '+name+' ✦'; el.style.display='block'; }
+  else { el.style.display='none'; }
+}
+
+function renderButtons() {
+  const nrW = tagsPsalmen[0];
+  const nrT = tagsPsalmen[1];
+  document.getElementById('pnum-0').textContent = nrW;
+  document.getElementById('pnum-1').textContent = nrT;
+  document.getElementById('phint-0').textContent = nrW===nrT ? 'Heute ident mit Tagesps.' : 'Perikopenordnung';
+  document.getElementById('phint-1').textContent = 'Kirchenjahr · '+WOCHENTAGE[aktuellDatum.getDay()];
+  for(let i=0;i<2;i++) document.getElementById(`pbtn-${i}`).classList.remove('active');
+}
+
+function zeigeAuswahl() {
+  document.getElementById('psalm-content').innerHTML = `
+    <div class="state-placeholder">
+      <div class="icon">✦</div>
+      <p>Wähle einen Psalm<br>um ihn zu lesen</p>
+      <span class="hint">Tasten 1 · 2</span>
+    </div>`;
+}
+
+/* ═══════════════════════════════════════════
+   PSALM ANZEIGEN
+   ═══════════════════════════════════════════ */
+function selectPsalm(idx) {
+  if(aktivIdx===idx) return;
+  aktivIdx=idx;
+  for(let i=0;i<2;i++) document.getElementById(`pbtn-${i}`).classList.toggle('active',i===idx);
+
+  const nr = tagsPsalmen[idx];
+  const psalm = PSALMEN[nr];
+  const type = idx===0 ? 'Wochenpsalm' : 'Tagespsalm';
+
+  if(!psalm) {
+    document.getElementById('psalm-content').innerHTML = `
+      <div class="state-placeholder">
+        <div class="icon">✦</div>
+        <p>Psalm ${nr} ist in dieser Version<br>noch nicht enthalten.</p>
+      </div>`;
+    return;
+  }
+
+  const verseHtml = psalm.v.map((v,i) => `
+    <div class="psalm-verse" style="animation-delay:${Math.min(i*15,600)}ms">
+      <span class="vnum">${v[0]}</span>
+      <span class="vtext">${esc(v[1])}</span>
+    </div>`).join('');
+
+  const supHtml = psalm.sup ? `<div class="psalm-sup">${esc(psalm.sup)}</div>` : '';
+
+  document.getElementById('psalm-content').innerHTML = `
+    <div class="psalm-inner">
+      <div class="psalm-header">
+        <div class="psalm-label">Psalm</div>
+        <div class="psalm-num">${nr}</div>
+        ${supHtml}
+        <span class="psalm-badge">${type}</span>
+      </div>
+      <div>${verseHtml}</div>
+    </div>`;
+}
+
+const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
+/* ═══════════════════════════════════════════
+   NAVIGATION
+   ═══════════════════════════════════════════ */
+function navigiereTo(datum) {
+  aktuellDatum = strip(datum);
+  aktivIdx = null;
+  const saison = getSaison(aktuellDatum);
+  tagsPsalmen  = [getWochenpsalmNr(aktuellDatum), getTagespsalmNr(aktuellDatum)];
+
+  renderDatum(aktuellDatum);
+  renderSaison(saison);
+  renderBesonderer(aktuellDatum);
+  renderButtons();
+  zeigeAuswahl();
+}
+
+function goToday() { navigiereTo(new Date()); }
+
+document.getElementById('btn-prev').addEventListener('click',()=>navigiereTo(addDays(aktuellDatum,-1)));
+document.getElementById('btn-next').addEventListener('click',()=>navigiereTo(addDays(aktuellDatum,1)));
+
+document.addEventListener('keydown', e => {
+  if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA') return;
+  if(e.key==='ArrowLeft')  navigiereTo(addDays(aktuellDatum,-1));
+  if(e.key==='ArrowRight') navigiereTo(addDays(aktuellDatum,1));
+  if(e.key==='1') selectPsalm(0);
+  if(e.key==='2') selectPsalm(1);
+  if(e.key==='t'||e.key==='T') goToday();
+});
+
+navigiereTo(new Date());
+
+/* ═══ LIGHT/DARK TOGGLE ═══ */
+const themeBtn = document.getElementById('btn-theme');
+function applyTheme(light) {
+  document.documentElement.classList.toggle('light', light);
+  document.body.classList.toggle('light', light);
+  themeBtn.textContent = light ? '☾' : '☀︎';
+  themeBtn.title = light ? 'Dunkelmodus (Taste D)' : 'Hellmodus (Taste D)';
+  try { localStorage.setItem('ps-theme', light ? 'light' : 'dark'); } catch(_){}
+}
+themeBtn.addEventListener('click', () => applyTheme(!document.body.classList.contains('light')));
+document.addEventListener('keydown', e => {
+  if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA') return;
+  if(e.key==='d'||e.key==='D') applyTheme(!document.body.classList.contains('light'));
+});
+try {
+  const saved = localStorage.getItem('ps-theme');
+  if(saved==='light') applyTheme(true);
+} catch(_){}
+
+</script>
+</body>
+</html>
